@@ -6,29 +6,33 @@ import com.ag.assignment.insurance.repository.VehicleFactorRepository;
 
 import java.math.BigDecimal;
 
-public class PremiumCalculationService implements PremiumCalculable {
+public class MotorVehiclePremiumService implements PremiumCalculable {
 
-    private final VehicleFactorRepository vehicleFactorRepository;
+    private static final BigDecimal COST_PER_CRASH = new BigDecimal("150.00");
     private final AgeGroupFactorRepository ageGroupFactorRepository;
 
-    private static final BigDecimal BASE_RATE = new BigDecimal("5000.00");
 
-    public PremiumCalculationService(VehicleFactorRepository vehicleFactorRepository, AgeGroupFactorRepository ageGroupFactorRepository) {
+    public MotorVehiclePremiumService(AgeGroupFactorRepository ageGroupFactorRepository) {
         this.ageGroupFactorRepository = ageGroupFactorRepository;
-        this.vehicleFactorRepository = vehicleFactorRepository;
     }
 
-    public BigDecimal calculatePremium(MotorVehiclePolicy policy){
+    public BigDecimal calculatePremium(MotorVehiclePolicy policy) {
+        if (policy == null || policy.getMotorVehicle() == null || policy.getPolicyHolder() == null) {
+            return BigDecimal.ZERO;
+        }
         MotorVehicle motorVehicle = policy.getMotorVehicle();
         PolicyHolder policyHolder = policy.getPolicyHolder();
         VehicleType vehicleType = motorVehicle.getVehicleType();
 
         int age = (int) policyHolder.getAge();
-        int previousClaims = policyHolder.getPreviousClaims();
+        int numberOfCrashes = policyHolder.getNumberOfCrashes();
 
-        double vehicleFactor = vehicleFactorRepository.getVehicleFactor(vehicleType);
-        double ageFactor = ageGroupFactorRepository.getFactor(age);
+        BigDecimal basePremium = BigDecimal.valueOf(vehicleType.getBasePremium());
+        BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorRepository.getFactor(age));
+        BigDecimal crashCost = COST_PER_CRASH.multiply(BigDecimal.valueOf(numberOfCrashes));
 
-        return policy.getBasePremium().multiply(BigDecimal.valueOf(vehicleFactor)).multiply(BigDecimal.valueOf(ageFactor));
+        BigDecimal ageSurcharge = basePremium.multiply(ageFactor);
+        return basePremium.add(ageSurcharge).add(crashCost);
     }
+
 }
