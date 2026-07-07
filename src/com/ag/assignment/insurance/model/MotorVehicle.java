@@ -38,12 +38,9 @@ public class MotorVehicle {
         return marketValue;
     }
 
-
-
     public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
     }
-
 
     public void setVehicleAge(BigDecimal vehicleAge) {
         this.vehicleAge = vehicleAge;

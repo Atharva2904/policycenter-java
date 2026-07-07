@@ -6,6 +6,4 @@ public enum VehicleType {
     CUV,
     SEDAN,
     VAN;
-
-
 }
