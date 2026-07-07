@@ -1,6 +1,4 @@
-package com.ag.assignment.insurance.service;
-
-import com.ag.assignment.insurance.model.MotorVehiclePolicy;
+package com.ag.assignment.insurance.model;
 
 import java.math.BigDecimal;
 

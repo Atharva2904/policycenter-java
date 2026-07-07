@@ -7,6 +7,7 @@ public class MotorVehiclePolicy extends Policy{
 
     private final MotorVehicle motorVehicle;
 
+
     public MotorVehiclePolicy(BigInteger policyNumber){
         super(policyNumber);
         this.motorVehicle = null;
@@ -16,7 +17,6 @@ public class MotorVehiclePolicy extends Policy{
         super();
         this.setPolicyHolder(policyHolder);
         this.motorVehicle = vehicle;
-        this.setBasePremium(BigDecimal.valueOf(5000));
     }
 
     public MotorVehicle getMotorVehicle() {

@@ -15,9 +15,12 @@ public class PolicyHolder extends Entity {
     private LocalDate dateOfBirth;
     private State state;
 
-    private int previousClaims;
+    private int age;
 
-    public PolicyHolder(){
+    private int previousClaims;
+    private int numberOfCrashes;
+
+    public PolicyHolder() {
         this.userID = UUID.randomUUID().toString();
     }
 
@@ -25,18 +28,42 @@ public class PolicyHolder extends Entity {
         return state;
     }
 
-    public long getAge(){
+    public long getAge() {
         // Returns user's age in years
 
-        LocalDate todayDate = LocalDate.now();
+        // ===================================================
+        // Had followed the date based age calculation approach earlier
 
-        return dateOfBirth.until(todayDate, ChronoUnit.YEARS);
+        // For now just directly returns the age using the attribute value
+
+        // LocalDate todayDate = LocalDate.now();
+        // return dateOfBirth.until(todayDate, ChronoUnit.YEARS);
         // return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
+        // ===================================================
+
+        return age;
     }
 
 
     public String getUserID() {
         return userID;
+    }
+
+    public void setNumberOfCrashes(int numberOfCrashes) {
+        if (numberOfCrashes < 0) {
+            throw new IllegalArgumentException("Number of crashes cannot be negative.");
+        }
+
+        this.numberOfCrashes = numberOfCrashes;
+    }
+
+    public void setAge(int age) {
+        if(age <= 0) throw new IllegalArgumentException("Age must be a value greater than 0!");
+
+        // Checks for legal age of user registering for the policy
+        if(age < 18) throw new IllegalArgumentException("Policyholder must be at least 18 years old to hold a policy.");
+
+        this.age = age;
     }
 
     public void setFirstName(String firstName) {
@@ -72,9 +99,15 @@ public class PolicyHolder extends Entity {
         this.state = state;
     }
 
+
     protected void setPreviousClaims(int previousClaims) {
         this.previousClaims = previousClaims;
     }
+
+    public int getNumberOfCrashes() {
+        return numberOfCrashes;
+    }
+
 
     public int getPreviousClaims() {
         return previousClaims;

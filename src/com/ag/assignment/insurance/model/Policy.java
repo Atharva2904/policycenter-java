@@ -9,18 +9,15 @@ import java.util.Random;
 
 public abstract class Policy {
     private final BigInteger policyNumber;
+    private PolicyHolder policyHolder;
+
     private final Instant createdAt;
     private Instant updatedAt;
     private PolicyStatus policyStatus;
-    private int policyLimit;
-    private int perClaimCost;
 
-    private PolicyHolder policyHolder;
     private LocalDate startDate;
     private LocalDate endDate;
 
-
-    private BigDecimal basePremium;
 
     public Policy(){
         Random rand = new Random();
@@ -30,8 +27,6 @@ public abstract class Policy {
         this.createdAt = Instant.now();
         this.policyStatus = PolicyStatus.PENDING;
 
-        this.policyLimit = 1;
-        this.perClaimCost = 500;
     }
 
     public Policy(BigInteger policyNumber){
@@ -39,7 +34,6 @@ public abstract class Policy {
         this.createdAt = Instant.now();
         this.policyStatus = PolicyStatus.PENDING;
 
-        this.policyLimit = 1;
     }
 
     public PolicyStatus getPolicyStatus() {
@@ -50,21 +44,8 @@ public abstract class Policy {
         return policyNumber;
     }
 
-
-    public int getPolicyLimit() {
-        return policyLimit;
-    }
-
     protected void setPolicyHolder(PolicyHolder policyHolder) {
         this.policyHolder = policyHolder;
-    }
-
-    protected void setBasePremium(BigDecimal basePremium) {
-        this.basePremium = basePremium;
-    }
-
-    protected void setPolicyLimit(int newPolicyLimit){
-        this.policyLimit = newPolicyLimit;
     }
 
     public PolicyHolder getPolicyHolder() {
@@ -81,13 +62,6 @@ public abstract class Policy {
         this.updatedAt = Instant.now();
     }
 
-    public int getPerClaimCost() {
-        return perClaimCost;
-    }
-
-    public BigDecimal getBasePremium() {
-        return basePremium;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -101,6 +75,7 @@ public abstract class Policy {
     public int hashCode() {
         return Objects.hashCode(policyNumber);
     }
+
 
 
 }
