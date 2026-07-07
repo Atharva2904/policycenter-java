@@ -5,7 +5,7 @@ import com.ag.assignment.insurance.repository.AgeGroupFactorRepository;
 import com.ag.assignment.insurance.repository.PolicyHolderRepository;
 import com.ag.assignment.insurance.repository.PolicyRepository;
 import com.ag.assignment.insurance.repository.VehicleFactorRepository;
-import com.ag.assignment.insurance.service.PremiumCalculationService;
+import com.ag.assignment.insurance.service.MotorVehiclePremiumService;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,10 +19,9 @@ public class Main {
         try {
             PolicyHolderRepository policyHolderRepository = new PolicyHolderRepository();
             AgeGroupFactorRepository ageGroupFactorRepository = new AgeGroupFactorRepository();
-            VehicleFactorRepository vehicleFactorRepository = new VehicleFactorRepository();
             PolicyRepository policyRepository = new PolicyRepository();
 
-            PremiumCalculationService premiumCalculationService = new PremiumCalculationService(vehicleFactorRepository, ageGroupFactorRepository);
+            MotorVehiclePremiumService premiumCalculationService = new MotorVehiclePremiumService(ageGroupFactorRepository);
 
 
             Scanner detailsScanner = new Scanner(System.in);
@@ -79,8 +78,10 @@ public class Main {
         }
     }
 
-    private static void calculatePremiumFlow(PolicyRepository policyRepo, PolicyHolderRepository policyHolderRepo, PremiumCalculationService premiumCalculationService, Scanner scanner){
+    private static void calculatePremiumFlow(PolicyRepository policyRepo, PolicyHolderRepository policyHolderRepo, MotorVehiclePremiumService premiumCalculationService, Scanner scanner){
         // Registering Policy Holder
+        // Here, accepting basic user information such as name, age, state etc.
+
         PolicyHolder policyHolder = addNewPolicyHolder(policyHolderRepo, scanner);
 
         // Registering vehicle details
@@ -144,7 +145,7 @@ public class Main {
         String vehicleNumber = scn.nextLine().trim();
 
         System.out.println("Select Vehicle Type:");
-        System.out.println("1. SEDAN\t2. SUV\t3. CUV\t4. XUV\t5. VAN");
+        System.out.println("1. SEDAN\t2. SUV\t3. CUV\t4. XUV\t5. VAN\t6. CAR\t7. TRUCK\t8. BIKE");
         System.out.print(">> ");
         String typeInput = scn.nextLine().toUpperCase().trim();
         VehicleType vehicleType = VehicleType.valueOf(typeInput);
@@ -188,11 +189,22 @@ public class Main {
         policyHolder.setDateOfBirth(dob);
 
 
+        System.out.print("Enter your age >> ");
+        int age = scn.nextInt();
+        policyHolder.setAge(age);
+        scn.nextLine();
+
+
+
         System.out.println("\nSelect your jurisdiction from the following choices >> ");
         System.out.println("1.Illinois(IS)\t2.Indiana(IN)\t3.Minnesota(MN)");
         System.out.print(">>");
         State personState = State.valueOf(scn.nextLine());
         policyHolder.setState(personState);
+
+        System.out.println("Do you have any history of vehicle crashes? If yes, enter number of crashes >> ");
+        int numberOfCrashes = scn.nextInt();
+        policyHolder.setNumberOfCrashes(numberOfCrashes);
 
         policyHolderRepository.save(policyHolder);
 
