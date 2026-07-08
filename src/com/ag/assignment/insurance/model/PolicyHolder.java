@@ -24,6 +24,15 @@ public class PolicyHolder extends Entity {
         this.userID = UUID.randomUUID().toString();
     }
 
+    public PolicyHolder(String firstName, String lastName, int age, State state){
+        this();
+        setFirstName(firstName);
+        setLastName(lastName);
+        setAge(age);
+        setState(state);
+    }
+
+
     public State getState() {
         return state;
     }

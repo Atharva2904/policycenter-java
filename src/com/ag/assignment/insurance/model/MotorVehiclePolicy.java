@@ -1,6 +1,5 @@
 package com.ag.assignment.insurance.model;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class MotorVehiclePolicy extends Policy{
