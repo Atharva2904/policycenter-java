@@ -6,7 +6,7 @@ import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-public class PolicyHolder extends Entity {
+public class PolicyHolder {
     private final String userID;
     private String firstName;
     private String middleName;
@@ -76,14 +76,26 @@ public class PolicyHolder extends Entity {
     }
 
     public void setFirstName(String firstName) {
+        if (firstName == null || !firstName.matches("[A-Za-z]+")) {
+            throw new IllegalArgumentException("First name cannot contain digits or special character!");
+        }
+
         this.firstName = firstName;
     }
 
     public void setMiddleName(String middleName) {
+        if (middleName == null || !middleName.matches("[A-Za-z]+")) {
+            throw new IllegalArgumentException("Middle name cannot contain digits or special character!");
+        }
+
         this.middleName = middleName;
     }
 
     public void setLastName(String lastName) {
+        if (lastName == null || !lastName.matches("[A-Za-z]+")) {
+            throw new IllegalArgumentException("Last name cannot contain digits or special character!");
+        }
+
         this.lastName = lastName;
     }
 
@@ -103,11 +115,9 @@ public class PolicyHolder extends Entity {
         this.dateOfBirth = dob;
     }
 
-
     public void setState(State state) {
         this.state = state;
     }
-
 
     protected void setPreviousClaims(int previousClaims) {
         this.previousClaims = previousClaims;
@@ -117,12 +127,10 @@ public class PolicyHolder extends Entity {
         return numberOfCrashes;
     }
 
-
     public int getPreviousClaims() {
         return previousClaims;
     }
 
-    @Override
     public String getDisplayName() {
         return firstName + " " + middleName + " " + lastName;
     }

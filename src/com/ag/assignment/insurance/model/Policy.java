@@ -1,5 +1,6 @@
 package com.ag.assignment.insurance.model;
 
+import javax.management.OperationsException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -19,18 +20,12 @@ public abstract class Policy {
     private LocalDate endDate;
 
 
+
     public Policy(){
         Random rand = new Random();
         int numBits = 16;
 
         this.policyNumber = new BigInteger(numBits, rand).add(BigInteger.valueOf(1000000));
-        this.createdAt = Instant.now();
-        this.policyStatus = PolicyStatus.PENDING;
-
-    }
-
-    public Policy(BigInteger policyNumber){
-        this.policyNumber = policyNumber;
         this.createdAt = Instant.now();
         this.policyStatus = PolicyStatus.PENDING;
 
@@ -52,15 +47,25 @@ public abstract class Policy {
         return policyHolder;
     }
 
-    public void activate(){
-        this.policyStatus = PolicyStatus.ACTIVE;
-        this.updatedAt = Instant.now();
+    protected void setPolicyStatus(PolicyStatus policyStatus) {
+        this.policyStatus = policyStatus;
     }
 
-    public void cancel(){
-        this.policyStatus = PolicyStatus.CANCELLED;
-        this.updatedAt = Instant.now();
+    protected void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
+
+    protected void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    protected void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public abstract void activate();
+
+    public abstract void cancel();
 
 
     @Override

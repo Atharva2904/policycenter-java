@@ -8,7 +8,7 @@ public class AgeGroupFactorRepository {
     private final List<AgeGroupFactor> ageGroupFactorList = List.of(
             new AgeGroupFactor(18, 25, 1.3),
             new AgeGroupFactor(26, 60, 1.0),
-            new AgeGroupFactor(61, 100, 1.4)
+            new AgeGroupFactor(61, 100, 1.2)
     );
 
     public double getFactor(int age){

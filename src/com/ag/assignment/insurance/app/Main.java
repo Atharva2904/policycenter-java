@@ -36,11 +36,13 @@ public class Main {
 
         // Creating Policy
         MotorVehiclePolicy motorVehiclePolicy = new MotorVehiclePolicy(policyHolder, motorVehicle);
+        motorVehiclePolicy.activate();
         policyRepo.save(motorVehiclePolicy);
+        System.out.println("Policy created successfully! Your policy number is: " + motorVehiclePolicy.getPolicyNumber());
 
         // Computing Premium
         BigDecimal premium = premiumCalculationService.calculatePremium(motorVehiclePolicy);
-        System.out.println("Premium: " + premium);
+        System.out.println("Premium amount is: " + premium);
 
     }
 
@@ -57,10 +59,7 @@ public class Main {
         System.out.print(">> ");
 
         VehicleType vehicleType = VehicleType.getVehicleFromChoice(Integer.parseInt(scn.nextLine()));
-
-        String fuelType = scn.nextLine().toUpperCase().trim();
-        MotorVehicle vehicle = new MotorVehicle(vehicleNumber, vehicleType, fuelType);
-
+        MotorVehicle vehicle = new MotorVehicle(vehicleNumber, vehicleType);
         System.out.println("Vehicle initialized successfully for number: " + vehicle.getVehicleNumber());
 
         return vehicle;
