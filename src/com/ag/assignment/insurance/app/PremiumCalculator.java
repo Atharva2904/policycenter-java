@@ -9,7 +9,7 @@ import com.ag.assignment.insurance.service.MotorVehiclePremiumService;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
-public class Main {
+public class PremiumCalculator {
     public static void main(String[] args) {
         try (Scanner detailsScanner = new Scanner(System.in)) {
             PolicyHolderRepository policyHolderRepository = new PolicyHolderRepository();

@@ -69,8 +69,12 @@ public class PolicyHolder {
     public void setAge(int age) {
         if(age <= 0) throw new IllegalArgumentException("Age must be a value greater than 0!");
 
+
         // Checks for legal age of user registering for the policy
         if(age < 18) throw new IllegalArgumentException("Policyholder must be at least 18 years old to hold a policy.");
+
+
+        if(age > 100) throw new IllegalArgumentException("Age cannot be more than 100!!");
 
         this.age = age;
     }
