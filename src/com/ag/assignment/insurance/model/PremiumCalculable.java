@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 
 public interface PremiumCalculable {
 
-    BigDecimal calculatePremium(MotorVehiclePolicy policy);
+    BigDecimal calculatePremium(Policy policy);
 
 }

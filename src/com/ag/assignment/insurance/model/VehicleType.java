@@ -1,14 +1,9 @@
 package com.ag.assignment.insurance.model;
 
 public enum VehicleType {
-    SUV(5000, 1.8, 1),
-    XUV(7000, 1.5, 2),
-    CUV(4500, 1.2, 3),
-    SEDAN(6500, 1.7, 4),
-    VAN(4000, 1.1, 5),
-    CAR(500, 1.4, 6),
-    TRUCK(800, 1.7, 7),
-    BIKE(300, 1.2, 8);
+    CAR(500, 1.4, 1),
+    TRUCK(800, 1.7, 2),
+    BIKE(300, 1.2, 3);
 
     private final double BASE_PREMIUM;
     private final double factor;

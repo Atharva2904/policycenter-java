@@ -1,5 +1,7 @@
 package com.ag.assignment.insurance.model;
 
+import com.ag.assignment.insurance.service.PolicyValidator;
+
 import javax.management.OperationsException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -8,8 +10,8 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Random;
 
-public abstract class Policy {
-    private final BigInteger policyNumber;
+public class Policy {
+    private final String policyNumber;
     private PolicyHolder policyHolder;
 
     private final Instant createdAt;
@@ -19,59 +21,50 @@ public abstract class Policy {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    private VehicleType vehicleType;
+    private int previousClaimsCount;
 
-
-    public Policy(){
-        Random rand = new Random();
-        int numBits = 16;
-
-        this.policyNumber = new BigInteger(numBits, rand).add(BigInteger.valueOf(1000000));
+    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, int previousClaimsCount) {
+        this.policyNumber = policyNumber;
+        this.policyHolder = policyHolder;
+        this.vehicleType = vehicleType;
+        this.previousClaimsCount = previousClaimsCount;
         this.createdAt = Instant.now();
-        this.policyStatus = PolicyStatus.PENDING;
+        this.startDate = LocalDate.now();
+    }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public int getPreviousClaimsCount() {
+        return previousClaimsCount;
+    }
+
+    public String getPolicyNumber() {
+        return policyNumber;
     }
 
     public PolicyStatus getPolicyStatus() {
         return policyStatus;
     }
 
-    public BigInteger getPolicyNumber() {
-        return policyNumber;
-    }
-
-    protected void setPolicyHolder(PolicyHolder policyHolder) {
-        this.policyHolder = policyHolder;
-    }
-
     public PolicyHolder getPolicyHolder() {
         return policyHolder;
     }
 
-    protected void setPolicyStatus(PolicyStatus policyStatus) {
-        this.policyStatus = policyStatus;
+    public VehicleType getVehicleType() {
+        return vehicleType;
     }
-
-    protected void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    protected void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    protected void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public abstract void activate();
-
-    public abstract void cancel();
-
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if(!(obj instanceof Policy policy)) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof Policy policy)) return false;
 
         return policyNumber.equals(policy.policyNumber);
     }
@@ -80,7 +73,6 @@ public abstract class Policy {
     public int hashCode() {
         return Objects.hashCode(policyNumber);
     }
-
 
 
 }
