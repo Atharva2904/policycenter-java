@@ -1,8 +1,6 @@
 package com.ag.assignment.insurance.service;
 
 import com.ag.assignment.insurance.model.Policy;
-import com.ag.assignment.insurance.model.VehicleType;
-
 
 public class PolicyValidator {
 

@@ -17,15 +17,16 @@ public class PremiumCalculator {
             AgeGroupFactorRepository ageGroupFactorRepository = new AgeGroupFactorRepository();
 
             System.out.println("--------------Welcome to Policy Management system!--------------");
-            System.out.println("Enter number of policies >> ");
+            System.out.print("Enter number of policies >> ");
             int numPolicies = detailsScanner.nextInt();
+            int count = 0;
             detailsScanner.nextLine();
 
             List<Policy> policyArray = new ArrayList<>();
 
             while (numPolicies > 0) {
                 System.out.println("=======================================================");
-                System.out.println("Enter Policy Details >> ");
+                System.out.println("Enter details for Policy " + ++count + " >> ");
                 System.out.println("=======================================================");
                 boolean isValid = false;
 
@@ -74,6 +75,7 @@ public class PremiumCalculator {
             for (Policy policy : policyArray) {
                 BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(policy);
                 BigDecimal discountedPremium = noClaimBonusCalculator.calculatePremium(policy);
+                System.out.println("=======================================================");
 
                 System.out.println("Policy Number >> " + policy.getPolicyNumber());
                 System.out.println("Policy Holder Name >> " + policy.getPolicyHolder().getDisplayName());
@@ -82,7 +84,6 @@ public class PremiumCalculator {
                 System.out.println("Discounted Premium >> " + discountedPremium);
 
             }
-
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -93,10 +94,10 @@ public class PremiumCalculator {
     public static PolicyHolder addNewPolicyHolder(Scanner scn) {
         String firstName, lastName;
 
-        System.out.println("Enter your first name >> ");
+        System.out.print("Enter your first name >> ");
         firstName = scn.nextLine();
 
-        System.out.println("Enter your last name >> ");
+        System.out.print("Enter your last name >> ");
         lastName = scn.nextLine();
 
 
