@@ -2,107 +2,116 @@ package com.ag.assignment.insurance.app;
 
 import com.ag.assignment.insurance.model.*;
 import com.ag.assignment.insurance.repository.AgeGroupFactorRepository;
-import com.ag.assignment.insurance.repository.PolicyHolderRepository;
-import com.ag.assignment.insurance.repository.PolicyRepository;
-import com.ag.assignment.insurance.service.MotorVehiclePremiumService;
+import com.ag.assignment.insurance.service.NoClaimBonusCalculator;
+import com.ag.assignment.insurance.service.PolicyValidator;
+import com.ag.assignment.insurance.service.StandardPremiumCalculator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PremiumCalculator {
     public static void main(String[] args) {
         try (Scanner detailsScanner = new Scanner(System.in)) {
-            PolicyHolderRepository policyHolderRepository = new PolicyHolderRepository();
             AgeGroupFactorRepository ageGroupFactorRepository = new AgeGroupFactorRepository();
-            PolicyRepository policyRepository = new PolicyRepository();
 
-            MotorVehiclePremiumService premiumCalculationService = new MotorVehiclePremiumService(ageGroupFactorRepository);
+            System.out.println("--------------Welcome to Policy Management system!--------------");
+            System.out.println("Enter number of policies >> ");
+            int numPolicies = detailsScanner.nextInt();
+            detailsScanner.nextLine();
 
-            calculatePremiumFlow(policyRepository, policyHolderRepository, premiumCalculationService, detailsScanner);
+            List<Policy> policyArray = new ArrayList<>();
+
+            while (numPolicies > 0) {
+                System.out.println("=======================================================");
+                System.out.println("Enter Policy Details >> ");
+                System.out.println("=======================================================");
+                boolean isValid = false;
+
+                while (!isValid) {
+                    try {
+                        PolicyHolder policyHolder = addNewPolicyHolder(detailsScanner);
+
+                        System.out.println("Select Vehicle Type (Enter respective number):");
+                        System.out.print("1. CAR\t2. TRUCK\t3. BIKE >> ");
+                        VehicleType vehicleType = VehicleType.getVehicleFromChoice(Integer.parseInt(detailsScanner.nextLine()));
+
+
+                        System.out.print("Do you have any history of previous claims? If yes, enter number of claims >> ");
+                        int numberOfClaims = detailsScanner.nextInt();
+                        detailsScanner.nextLine();
+
+                        System.out.print("Enter policy number >> ");
+                        String policyNumber = detailsScanner.nextLine();
+
+                        Policy policy = new Policy(policyNumber, policyHolder, vehicleType, numberOfClaims);
+                        if (PolicyValidator.validate(policy)) {
+                            numPolicies--;
+                            policyArray.add(policy);
+                            isValid = true;
+                            System.out.println("Policy validated successfully!!");
+                        }
+                        else{
+                            System.out.println("Policy Validation failed! Please re-enter details for this policy.");
+                        }
+                    }
+                    catch (Exception e){
+                        System.out.println("\n[ERROR] Invalid input or processing error: " + e.getMessage());
+                        System.out.println("Please restart entering details for this policy.\n");
+
+                        if (detailsScanner.hasNextLine()) {
+                            detailsScanner.nextLine();
+                        }
+                    }
+
+                }
+            }
+
+            StandardPremiumCalculator standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorRepository);
+            NoClaimBonusCalculator noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorRepository);
+
+            for (Policy policy : policyArray) {
+                BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(policy);
+                BigDecimal discountedPremium = noClaimBonusCalculator.calculatePremium(policy);
+
+                System.out.println("Policy Number >> " + policy.getPolicyNumber());
+                System.out.println("Policy Holder Name >> " + policy.getPolicyHolder().getDisplayName());
+                System.out.println("Policy Holder Age >> " + policy.getPolicyHolder().getAge());
+                System.out.println("Standard Premium >> " + standardPremium);
+                System.out.println("Discounted Premium >> " + discountedPremium);
+
+            }
+
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private static void calculatePremiumFlow(PolicyRepository policyRepo, PolicyHolderRepository policyHolderRepo, MotorVehiclePremiumService premiumCalculationService, Scanner scanner){
-        // Registering Policy Holder
-        // Here, accepting basic user information such as name, age, state etc.
 
-        PolicyHolder policyHolder = addNewPolicyHolder(policyHolderRepo, scanner);
-
-        // Registering vehicle details
-        MotorVehicle motorVehicle = addNewVehicle(scanner);
-
-        // Creating Policy
-        MotorVehiclePolicy motorVehiclePolicy = new MotorVehiclePolicy(policyHolder, motorVehicle);
-        motorVehiclePolicy.activate();
-        policyRepo.save(motorVehiclePolicy);
-        System.out.println("Policy created successfully! Your policy number is: " + motorVehiclePolicy.getPolicyNumber());
-
-        // Computing Premium
-        BigDecimal premium = premiumCalculationService.calculatePremium(motorVehiclePolicy);
-        System.out.println("Premium amount is: " + premium);
-
-    }
-
-    public static MotorVehicle addNewVehicle(Scanner scn) {
-        System.out.println("\n--- Enter Vehicle Details ---");
-        scn.nextLine();
-
-        System.out.print("Enter Vehicle Registration Number >> ");
-        String vehicleNumber = scn.nextLine().trim();
-        System.out.println(vehicleNumber);
-
-        System.out.println("Select Vehicle Type (Enter respective number):");
-        System.out.println("1. SUV\t2. XUV\t3. CUV\t4. SEDAN\t5. VAN\t6. CAR\t7. TRUCK\t8. BIKE");
-        System.out.print(">> ");
-
-        VehicleType vehicleType = VehicleType.getVehicleFromChoice(Integer.parseInt(scn.nextLine()));
-        MotorVehicle vehicle = new MotorVehicle(vehicleNumber, vehicleType);
-        System.out.println("Vehicle initialized successfully for number: " + vehicle.getVehicleNumber());
-
-        return vehicle;
-    }
-
-    public static PolicyHolder addNewPolicyHolder(PolicyHolderRepository policyHolderRepository, Scanner scn) {
-        PolicyHolder policyHolder = new PolicyHolder();
-        String firstName, middleName, lastName;
+    public static PolicyHolder addNewPolicyHolder(Scanner scn) {
+        String firstName, lastName;
 
         System.out.println("Enter your first name >> ");
         firstName = scn.nextLine();
-        policyHolder.setFirstName(firstName);
-
-        System.out.println("Enter your middle name >> ");
-        middleName = scn.nextLine();
-        policyHolder.setMiddleName(middleName);
 
         System.out.println("Enter your last name >> ");
         lastName = scn.nextLine();
-        policyHolder.setLastName(lastName);
-
-        System.out.print("Enter your Date of Birth in dd/MM/yyyy format >> ");
-        String dob = scn.nextLine();
-        policyHolder.setDateOfBirth(dob);
 
 
         System.out.print("Enter your age >> ");
         int age = scn.nextInt();
-        policyHolder.setAge(age);
         scn.nextLine();
-
+        PolicyValidator.validateAge(age);
 
         System.out.println("\nSelect your jurisdiction from the following choices >> ");
         System.out.println("1.Illinois(IS)\t2.Indiana(IN)\t3.Minnesota(MN) (Enter respective number)");
         System.out.print(">>");
         State personState = State.getStateFromChoice(Integer.parseInt(scn.nextLine()));
-        policyHolder.setState(personState);
 
-        System.out.println("Do you have any history of vehicle crashes? If yes, enter number of crashes >> ");
-        int numberOfCrashes = scn.nextInt();
-        policyHolder.setNumberOfCrashes(numberOfCrashes);
 
-        policyHolderRepository.save(policyHolder);
+        PolicyHolder policyHolder = new PolicyHolder(firstName, lastName, age, personState);
 
         System.out.println("Account created successfully! Your userID is: " + policyHolder.getUserID());
 
