@@ -4,7 +4,7 @@ import com.ag.assignment.insurance.model.AgeGroupFactor;
 
 import java.util.List;
 
-public class AgeGroupFactorRepository {
+public class AgeGroupFactorStore {
     private final List<AgeGroupFactor> ageGroupFactorList = List.of(
             new AgeGroupFactor(18, 25, 1.3),
             new AgeGroupFactor(26, 60, 1.0),

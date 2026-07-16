@@ -1,22 +1,22 @@
 package com.ag.assignment.insurance.service;
 
 import com.ag.assignment.insurance.model.PolicyHolder;
-import com.ag.assignment.insurance.repository.PolicyHolderRepository;
+import com.ag.assignment.insurance.repository.PolicyHolderStore;
 
 public class PolicyHolderService {
 
-    private final PolicyHolderRepository policyHolderRepository;
+    private final PolicyHolderStore policyHolderStore;
 
-    public PolicyHolderService(PolicyHolderRepository policyHolderRepository){
-        this.policyHolderRepository = policyHolderRepository;
+    public PolicyHolderService(PolicyHolderStore policyHolderStore){
+        this.policyHolderStore = policyHolderStore;
     }
 
     public PolicyHolder getPolicyHolder(String policyHolderId){
-        return policyHolderRepository.getPolicyHolderById(policyHolderId);
+        return policyHolderStore.getPolicyHolderById(policyHolderId);
     }
 
     public void registerPolicyHolder(PolicyHolder policyHolder){
-        policyHolderRepository.save(policyHolder);
+        policyHolderStore.save(policyHolder);
     }
 
 

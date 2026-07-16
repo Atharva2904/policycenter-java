@@ -2,17 +2,16 @@ package com.ag.assignment.insurance.repository;
 
 import com.ag.assignment.insurance.model.Policy;
 
-import java.math.BigInteger;
 import java.util.*;
 
-public class PolicyRepository {
-    private final Map<BigInteger, Policy> policyMap = new HashMap<>();
+public class PolicyStore {
+    private final Map<String, Policy> policyMap = new HashMap<>();
 
     public void save(Policy policy){
         policyMap.put(policy.getPolicyNumber(), policy);
     }
 
-    public Policy getPolicyByNumber(BigInteger policyNumber){
+    public Policy getPolicyByNumber(String policyNumber){
         return policyMap.get(policyNumber);
     }
 

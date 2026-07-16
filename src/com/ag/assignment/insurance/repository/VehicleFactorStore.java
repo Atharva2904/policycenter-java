@@ -4,14 +4,12 @@ import com.ag.assignment.insurance.model.VehicleType;
 
 import java.util.Map;
 
-public class VehicleFactorRepository {
+public class VehicleFactorStore {
 
     private final Map<VehicleType, Double> vehicleFactors = Map.of(
-            VehicleType.SEDAN, 1.8,
-            VehicleType.SUV, 1.5,
-            VehicleType.CUV, 1.2,
-            VehicleType.XUV, 1.7,
-            VehicleType.VAN, 1.1
+            VehicleType.TRUCK, 1.8,
+            VehicleType.CAR, 1.5,
+            VehicleType.BIKE, 1.2
     );
 
     public double getVehicleFactor(VehicleType vehicleType) {

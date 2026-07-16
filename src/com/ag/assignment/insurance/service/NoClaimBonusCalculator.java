@@ -2,16 +2,16 @@ package com.ag.assignment.insurance.service;
 
 import com.ag.assignment.insurance.model.Policy;
 import com.ag.assignment.insurance.model.PremiumCalculable;
-import com.ag.assignment.insurance.repository.AgeGroupFactorRepository;
+import com.ag.assignment.insurance.repository.AgeGroupFactorStore;
 
 import java.math.BigDecimal;
 
 public class NoClaimBonusCalculator implements PremiumCalculable {
     private static final BigDecimal COST_PER_CLAIM = new BigDecimal("150.0");
-    private final AgeGroupFactorRepository ageGroupFactorRepository;
+    private final AgeGroupFactorStore ageGroupFactorStore;
 
-    public NoClaimBonusCalculator(AgeGroupFactorRepository ageGroupFactorRepository) {
-        this.ageGroupFactorRepository = ageGroupFactorRepository;
+    public NoClaimBonusCalculator(AgeGroupFactorStore ageGroupFactorStore) {
+        this.ageGroupFactorStore = ageGroupFactorStore;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class NoClaimBonusCalculator implements PremiumCalculable {
         int numberOfClaims = policy.getPreviousClaimsCount();
 
         BigDecimal basePremium = BigDecimal.valueOf(policy.getVehicleType().getBasePremium());
-        BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorRepository.getFactor(age));
+        BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorStore.getFactor(age));
         BigDecimal crashCost = COST_PER_CLAIM.multiply(BigDecimal.valueOf(numberOfClaims));
 
         BigDecimal ageSurcharge = basePremium.multiply(ageFactor);

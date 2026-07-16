@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PolicyHolderRepository {
+public class PolicyHolderStore {
     private final Map<String, PolicyHolder> policyHolderMap = new HashMap<>();
 
 

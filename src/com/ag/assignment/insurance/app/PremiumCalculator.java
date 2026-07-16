@@ -1,7 +1,7 @@
 package com.ag.assignment.insurance.app;
 
 import com.ag.assignment.insurance.model.*;
-import com.ag.assignment.insurance.repository.AgeGroupFactorRepository;
+import com.ag.assignment.insurance.repository.AgeGroupFactorStore;
 import com.ag.assignment.insurance.service.NoClaimBonusCalculator;
 import com.ag.assignment.insurance.service.PolicyValidator;
 import com.ag.assignment.insurance.service.StandardPremiumCalculator;
@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class PremiumCalculator {
     public static void main(String[] args) {
         try (Scanner detailsScanner = new Scanner(System.in)) {
-            AgeGroupFactorRepository ageGroupFactorRepository = new AgeGroupFactorRepository();
+            AgeGroupFactorStore ageGroupFactorStore = new AgeGroupFactorStore();
 
             System.out.println("--------------Welcome to Policy Management system!--------------");
             System.out.print("Enter number of policies >> ");
@@ -69,8 +69,8 @@ public class PremiumCalculator {
                 }
             }
 
-            StandardPremiumCalculator standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorRepository);
-            NoClaimBonusCalculator noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorRepository);
+            StandardPremiumCalculator standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorStore);
+            NoClaimBonusCalculator noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorStore);
 
             for (Policy policy : policyArray) {
                 BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(policy);
