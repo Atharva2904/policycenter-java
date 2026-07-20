@@ -1,7 +1,7 @@
-package com.ag.assignment.insurance.service;
+package com.wipfli.training.service;
 
-import com.ag.assignment.insurance.model.PolicyHolder;
-import com.ag.assignment.insurance.repository.PolicyHolderStore;
+import com.wipfli.training.model.PolicyHolder;
+import com.wipfli.training.store.PolicyHolderStore;
 
 public class PolicyHolderService {
 

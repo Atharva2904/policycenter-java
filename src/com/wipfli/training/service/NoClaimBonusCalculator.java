@@ -1,8 +1,8 @@
-package com.ag.assignment.insurance.service;
+package com.wipfli.training.service;
 
-import com.ag.assignment.insurance.model.Policy;
-import com.ag.assignment.insurance.model.PremiumCalculable;
-import com.ag.assignment.insurance.repository.AgeGroupFactorStore;
+import com.wipfli.training.model.Policy;
+import com.wipfli.training.model.PremiumCalculable;
+import com.wipfli.training.store.AgeGroupFactorStore;
 
 import java.math.BigDecimal;
 

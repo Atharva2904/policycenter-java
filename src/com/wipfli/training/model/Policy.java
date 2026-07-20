@@ -1,14 +1,8 @@
-package com.ag.assignment.insurance.model;
+package com.wipfli.training.model;
 
-import com.ag.assignment.insurance.service.PolicyValidator;
-
-import javax.management.OperationsException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Random;
 
 public class Policy {
     private final String policyNumber;

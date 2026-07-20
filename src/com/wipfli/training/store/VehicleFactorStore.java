@@ -1,6 +1,6 @@
-package com.ag.assignment.insurance.repository;
+package com.wipfli.training.store;
 
-import com.ag.assignment.insurance.model.VehicleType;
+import com.wipfli.training.model.VehicleType;
 
 import java.util.Map;
 

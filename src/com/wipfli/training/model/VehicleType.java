@@ -1,4 +1,4 @@
-package com.ag.assignment.insurance.model;
+package com.wipfli.training.model;
 
 public enum VehicleType {
     CAR(500, 1.4, 1),

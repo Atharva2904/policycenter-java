@@ -1,6 +1,6 @@
-package com.ag.assignment.insurance.service;
+package com.wipfli.training.service;
 
-import com.ag.assignment.insurance.model.Policy;
+import com.wipfli.training.model.Policy;
 
 public class PolicyValidator {
 

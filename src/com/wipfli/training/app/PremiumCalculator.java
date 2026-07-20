@@ -1,10 +1,10 @@
-package com.ag.assignment.insurance.app;
+package com.wipfli.training.app;
 
-import com.ag.assignment.insurance.model.*;
-import com.ag.assignment.insurance.repository.AgeGroupFactorStore;
-import com.ag.assignment.insurance.service.NoClaimBonusCalculator;
-import com.ag.assignment.insurance.service.PolicyValidator;
-import com.ag.assignment.insurance.service.StandardPremiumCalculator;
+import com.wipfli.training.model.*;
+import com.wipfli.training.store.AgeGroupFactorStore;
+import com.wipfli.training.service.NoClaimBonusCalculator;
+import com.wipfli.training.service.PolicyValidator;
+import com.wipfli.training.service.StandardPremiumCalculator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -69,8 +69,8 @@ public class PremiumCalculator {
                 }
             }
 
-            StandardPremiumCalculator standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorStore);
-            NoClaimBonusCalculator noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorStore);
+            PremiumCalculable standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorStore);
+            PremiumCalculable noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorStore);
 
             for (Policy policy : policyArray) {
                 BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(policy);

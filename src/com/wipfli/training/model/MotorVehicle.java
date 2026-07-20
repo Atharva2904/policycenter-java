@@ -1,4 +1,4 @@
-package com.ag.assignment.insurance.model;
+package com.wipfli.training.model;
 
 public class MotorVehicle {
     private VehicleType vehicleType;
