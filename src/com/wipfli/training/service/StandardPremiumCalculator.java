@@ -23,7 +23,7 @@ public class StandardPremiumCalculator implements PremiumCalculable {
         }
 
         int age = (int) policy.getPolicyHolder().getAge();
-        int numberOfClaims = policy.getPreviousClaimsCount();
+        int numberOfClaims = policy.getClaimsCount();
 
         BigDecimal basePremium = BigDecimal.valueOf(policy.getVehicleType().getBasePremium());
         BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorStore.getFactor(age));
