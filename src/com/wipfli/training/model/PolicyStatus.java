@@ -11,7 +11,7 @@ public enum PolicyStatus {
      * @param nextStatus
      * @return true or false
      */
-    public boolean canTransitionTo(PolicyStatus nextStatus){
+    boolean canTransitionTo(PolicyStatus nextStatus){
         return switch (this){
             case ACTIVE -> nextStatus == EXPIRED || nextStatus == RENEWED;  // Policy can only be EXPIRED/RENEWED if it is ACTIVE
             case EXPIRED -> false;      // if Policy is Expired, it can neither be RENEWED nor be made ACTIVE again
