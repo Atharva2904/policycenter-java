@@ -4,7 +4,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Policy {
+/**
+ * Represents an abstract insurance policy within the management system.
+ * <p>
+ * This class serves as the central blueprint for specific vehicle policy types,
+ * such as {@link BikePolicy}, {@link TruckPolicy}, and {@link CarPolicy}. It manages
+ * shared attributes including PolicyHolder details, number of previous claims, vehicle type etc.
+ */
+
+public abstract class Policy {
     private final String policyNumber;
     private PolicyHolder policyHolder;
 
@@ -15,6 +23,27 @@ public class Policy {
 
     private VehicleType vehicleType;
     private int claimsCount;
+
+
+    /**
+     * This constructor accepts following parameters:
+     * @param policyNumber
+     * @param policyHolder
+     * @param vehicleType
+     * It does not accept claims count as a parameter. It is set to 0 by default.
+     */
+
+    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType) {
+        this(policyNumber, policyHolder, vehicleType, 0);
+    }
+
+    /**
+     * This is overloaded constructor of Policy class which also accepts previousClaimsCount as parameter.
+     * @param policyNumber
+     * @param policyHolder
+     * @param vehicleType
+     * @param previousClaimsCount
+     */
 
     public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, int previousClaimsCount) {
         this.policyNumber = policyNumber;
@@ -116,6 +145,10 @@ public class Policy {
     public int hashCode() {
         return Objects.hashCode(policyNumber);
     }
+
+
+    public abstract String getPolicyDetails();
+
 
 
 }
