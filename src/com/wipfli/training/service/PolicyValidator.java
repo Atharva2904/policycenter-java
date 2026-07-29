@@ -1,5 +1,7 @@
 package com.wipfli.training.service;
 
+import com.wipfli.training.exception.InvalidPolicyDataException;
+import com.wipfli.training.exception.PolicyNotFoundException;
 import com.wipfli.training.model.Policy;
 
 public class PolicyValidator {
@@ -14,19 +16,19 @@ public class PolicyValidator {
 
     }
 
-    public static boolean validate(Policy policy) {
-        if (policy == null) throw new IllegalArgumentException("Policy object cannot be null!");
+    public static void validate(Policy policy, PolicyRegister policyRegister) throws PolicyNotFoundException {
+        if (policy == null) throw new PolicyNotFoundException("Policy object cannot be null!");
+
+        String policyNumber = policy.getPolicyNumber();
 
 
-        if(policy.getVehicleType() == null) throw new IllegalArgumentException("""
+        if(policy.getVehicleType() == null) throw new InvalidPolicyDataException(policyNumber, """
                 Vehicle type cannot be null! Enter one of the following choices:
                 1. CAR\t2. TRUCK\t3. BIKE
                 """) ;
 
         if(policy.getClaimsCount() < 0)
-            throw new IllegalArgumentException("No. of claims must be greater than or equal to 0!! Please enter a valid value.");
+            throw new InvalidPolicyDataException(policyNumber, "No. of claims must be greater than or equal to 0!! Please enter a valid value.");
 
-
-        return true;
     }
 }

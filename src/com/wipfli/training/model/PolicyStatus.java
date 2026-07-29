@@ -18,7 +18,7 @@ public enum PolicyStatus {
         return switch (this){
             case ACTIVE -> nextStatus == EXPIRED || nextStatus == RENEWED;  // Policy can only be EXPIRED/RENEWED if it is ACTIVE
             case EXPIRED -> false;      // if Policy is Expired, it can neither be RENEWED nor be made ACTIVE again
-            case RENEWED -> nextStatus == ACTIVE;   // Policy can be ACTIVE only if it is in RENEWED state
+            case RENEWED -> nextStatus == ACTIVE || nextStatus == EXPIRED;   // Policy can be ACTIVE only if it is in RENEWED state
         };
     }
 }
