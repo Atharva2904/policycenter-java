@@ -1,6 +1,6 @@
-package com.ag.assignment.insurance.service;
+package com.wipfli.training.service;
 
-import com.ag.assignment.insurance.model.Policy;
+import com.wipfli.training.model.Policy;
 
 public class PolicyValidator {
 
@@ -23,7 +23,7 @@ public class PolicyValidator {
                 1. CAR\t2. TRUCK\t3. BIKE
                 """) ;
 
-        if(policy.getPreviousClaimsCount() < 0)
+        if(policy.getClaimsCount() < 0)
             throw new IllegalArgumentException("No. of claims must be greater than or equal to 0!! Please enter a valid value.");
 
 

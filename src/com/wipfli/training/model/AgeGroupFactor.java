@@ -1,4 +1,4 @@
-package com.ag.assignment.insurance.model;
+package com.wipfli.training.model;
 
 public class AgeGroupFactor {
     private final int minAge;

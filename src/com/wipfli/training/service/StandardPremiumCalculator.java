@@ -1,8 +1,8 @@
-package com.ag.assignment.insurance.service;
+package com.wipfli.training.service;
 
-import com.ag.assignment.insurance.model.Policy;
-import com.ag.assignment.insurance.model.PremiumCalculable;
-import com.ag.assignment.insurance.repository.AgeGroupFactorStore;
+import com.wipfli.training.model.Policy;
+import com.wipfli.training.model.PremiumCalculable;
+import com.wipfli.training.store.AgeGroupFactorStore;
 
 import java.math.BigDecimal;
 
@@ -14,6 +14,8 @@ public class StandardPremiumCalculator implements PremiumCalculable {
     public StandardPremiumCalculator(AgeGroupFactorStore ageGroupFactorStore){
         this.ageGroupFactorStore = ageGroupFactorStore;
     }
+
+
     @Override
     public BigDecimal calculatePremium(Policy policy) {
         if(policy == null || policy.getVehicleType() == null || policy.getPolicyHolder() == null){
@@ -21,7 +23,7 @@ public class StandardPremiumCalculator implements PremiumCalculable {
         }
 
         int age = (int) policy.getPolicyHolder().getAge();
-        int numberOfClaims = policy.getPreviousClaimsCount();
+        int numberOfClaims = policy.getClaimsCount();
 
         BigDecimal basePremium = BigDecimal.valueOf(policy.getVehicleType().getBasePremium());
         BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorStore.getFactor(age));

@@ -1,6 +1,6 @@
-package com.ag.assignment.insurance.repository;
+package com.wipfli.training.store;
 
-import com.ag.assignment.insurance.model.Policy;
+import com.wipfli.training.model.Policy;
 
 import java.util.*;
 

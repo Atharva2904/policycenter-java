@@ -1,6 +1,6 @@
-package com.ag.assignment.insurance.repository;
+package com.wipfli.training.store;
 
-import com.ag.assignment.insurance.model.PolicyHolder;
+import com.wipfli.training.model.PolicyHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
