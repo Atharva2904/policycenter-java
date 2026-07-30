@@ -8,6 +8,9 @@ public enum PolicyStatus {
     /**
      * This function determines the valid states to which a PolicyStatus can transition to from the given current state.
      * It returns boolean value depending on the next transition status provided.
+     * It is a package-private method which is used by Policy to determine the valid transition
+     * The external classes (outside to this package) need not know about the internal implementation details of the policy domain modeling.
+     * Hence, it is not exposed as public API method.
      * @param nextStatus
      * @return true or false
      */
