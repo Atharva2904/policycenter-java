@@ -117,13 +117,24 @@ public abstract class Policy {
         }
 
 
-        // If renewalDate is 30 days prior to the expiry date of policy, it should throw RenewalNotAllowedException
+        if(renewalDate.isAfter(this.expiryDate))
+            throw new RenewalNotAllowedException(this.policyNumber,
+                    String.format(
+                            "Policy %s cannot be renewed on %s. Expiry date of the Policy is %s\n" +
+                                    "Policy cannot be renewed after it has expired!",
+                            this.policyNumber,
+                            renewalDate,
+                            this.expiryDate
+                    ));
+
+        // If renewalDate is more than 30 days prior to the expiry date of policy, it should throw RenewalNotAllowedException
         LocalDate earliestAllowedRenewalDate = this.expiryDate.minusDays(30);
         if(renewalDate.isBefore(earliestAllowedRenewalDate)) {
             long daysTooEarly = ChronoUnit.DAYS.between(renewalDate, earliestAllowedRenewalDate);
             throw new RenewalNotAllowedException(this.policyNumber,
                     String.format(
-                            "Policy %s cannot be renewed on %s. The request is being made %d days too early. Renewal window opens on %s (30 days prior to expiry %s).",
+                            "Policy %s cannot be renewed on %s. The request is being made %d days too early.\n" +
+                                    "Renewal window opens on %s (30 days prior to expiry %s).",
                             this.policyNumber,
                             renewalDate,
                             daysTooEarly,

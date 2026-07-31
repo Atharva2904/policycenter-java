@@ -16,8 +16,8 @@ public class PolicyValidator {
 
     }
 
-    public static void validate(Policy policy, PolicyRegister policyRegister) throws PolicyNotFoundException {
-        if (policy == null) throw new PolicyNotFoundException("Policy object cannot be null!");
+    public static void validate(Policy policy) throws PolicyNotFoundException {
+        if (policy == null) throw new PolicyNotFoundException("UNKNOWN", "Policy object cannot be null!");
 
         String policyNumber = policy.getPolicyNumber();
 

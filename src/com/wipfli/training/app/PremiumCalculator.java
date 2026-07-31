@@ -27,16 +27,9 @@ public class PremiumCalculator {
     public static void main(String[] args) {
         try (Scanner detailsScanner = new Scanner(System.in)) {
             simulatePolicyOperations(detailsScanner);
-        } catch (PolicyNotFoundException e) {
-            System.out.println(
-                    String.format("REFUSED [%s]: %s", e.getClass().getSimpleName(), e.getMessage())
-            );
-        } catch (PolicyBusinessException e) {
-            System.out.println(
-                    String.format("REFUSED [%s] %s: %s", e.getClass().getSimpleName(), e.getPolicyNumber(), e.getMessage())
-            );
-        }
-        finally {
+        } catch (Exception e) {
+            System.out.println(String.format("Fatal Application error received [%s] : %s", e.getClass(), e.getMessage()));
+        } finally {
             System.out.println("Program finished normally...");
         }
 
@@ -79,8 +72,13 @@ public class PremiumCalculator {
             );
 
 
-            PolicyValidator.validate(carPolicy, policyRegisterService);
+            PolicyValidator.validate(carPolicy);
             policyRegisterService.add(carPolicy);
+
+            System.out.println("Car Policy created successfully! Policy Details: ");
+            System.out.println(
+                    carPolicy.getPolicyDetails()
+            );
 
         } catch (NumberFormatException e) {
             String finalPolicyNumber = (policyNumber != null) ? policyNumber : "UNKNOWN";
@@ -137,8 +135,14 @@ public class PremiumCalculator {
                     loadCapacity,
                     parsedExpiryDate
             );
-            PolicyValidator.validate(truckPolicy, policyRegisterService);
+            PolicyValidator.validate(truckPolicy);
             policyRegisterService.add(truckPolicy);
+
+            System.out.println("Truck Policy created successfully! Policy Details: ");
+            System.out.println(
+                    truckPolicy.getPolicyDetails()
+            );
+
         } catch (DateTimeParseException e) {
             throw new InvalidPolicyDataException(
                     policyNumber,
@@ -189,8 +193,14 @@ public class PremiumCalculator {
                     engineCapacity, parsedExpiryDate
             );
 
-            PolicyValidator.validate(bikePolicy, policyRegisterService);
+            PolicyValidator.validate(bikePolicy);
             policyRegisterService.add(bikePolicy);
+
+            System.out.println("Bike Policy created successfully! Policy Details: ");
+
+            System.out.println(
+                    bikePolicy.getPolicyDetails()
+            );
 
         } catch (DateTimeParseException e) {
             throw new InvalidPolicyDataException(
@@ -211,6 +221,7 @@ public class PremiumCalculator {
      * This is a helper function which helps in completion of following tasks:
      * 1. Creation of PolicyHolder Object
      * 2. Accepting Vehicle Type as input and calling the respective Policy input helper functions: {@code collectTruckPolicyInput} {@code collectCarPolicyInput} {@code collectBikePolicyInput}
+     *
      * @param detailsScanner
      * @throws PolicyNotFoundException
      * @throws PolicyBusinessException
@@ -234,78 +245,87 @@ public class PremiumCalculator {
 
     /**
      * This is a helper function which helps in simulating different operations on the policy through a menu-driven program.
+     *
      * @param detailsScanner
      * @throws PolicyNotFoundException
      * @throws PolicyBusinessException
      */
-    public static void simulatePolicyOperations(Scanner detailsScanner) throws PolicyNotFoundException, PolicyBusinessException {
+    public static void simulatePolicyOperations(Scanner detailsScanner) {
         boolean exit = false;
-        Policy policy = null;
+        Policy currentPolicy = null;
         String policyNumber = null;
-        try {
-            System.out.println("--------------Welcome to Policy Management system!--------------");
+        System.out.println("--------------Welcome to Policy Management system!--------------");
 
-            PremiumCalculable standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorStore);
-            PremiumCalculable noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorStore);
+        while (!exit) {
+            try {
+
+                PremiumCalculable standardPremiumCalculator = new StandardPremiumCalculator(ageGroupFactorStore);
+                PremiumCalculable noClaimBonusCalculator = new NoClaimBonusCalculator(ageGroupFactorStore);
 
 
-            while (!exit) {
                 System.out.println("\n================ POLICY OPERATIONS MENU ================");
-                System.out.println("1. Create New Policy");
-                System.out.println("2. Compute / View Premium");
-                System.out.println("3. Record a Claim (Increment Claims)");
-                System.out.println("4. Expire Policy");
-                System.out.println("5. Renew Policy");
-                System.out.println("6. View Policy Details");
-                System.out.println("7. Exit");
+                System.out.println("1. Create And Register New Policy");
+                System.out.println("2. Select Policy");
+                System.out.println("3. Compute / View Premium");
+                System.out.println("4. Record a Claim (Increment Claims)");
+                System.out.println("5. Expire Policy");
+                System.out.println("6. Renew Policy");
+                System.out.println("7. View Policy Details");
+                System.out.println("8. Exit");
                 System.out.print("Enter choice >> ");
 
                 int choice = Integer.parseInt(detailsScanner.nextLine());
 
-                if (choice != 1) {
 
-                    System.out.println("Enter policy number >> ");
-                    policyNumber = detailsScanner.nextLine();
-
-                    policy = policyRegisterService.findByNumber(policyNumber);
-                }
                 switch (choice) {
                     case 1:
                         simulatePolicyDetailsInput(detailsScanner);
                         break;
 
                     case 2:
+                        System.out.println("Enter policy number >> ");
+                        policyNumber = detailsScanner.nextLine();
+                        currentPolicy = policyRegisterService.findByNumber(policyNumber);
+                        System.out.println("Policy selected successfully: " + currentPolicy.getPolicyNumber());
+                        break;
+
+                    case 3:
+                        verifyPolicySelected(currentPolicy);
                         System.out.println("\n[ACTION] Computing Premium...");
-                        BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(policy);
-                        BigDecimal discountedPremium = noClaimBonusCalculator.calculatePremium(policy);
+                        BigDecimal standardPremium = standardPremiumCalculator.calculatePremium(currentPolicy);
+                        BigDecimal discountedPremium = noClaimBonusCalculator.calculatePremium(currentPolicy);
                         System.out.println("Standard Premium >> " + standardPremium);
                         System.out.println("Discounted Premium >> " + discountedPremium);
                         break;
 
-                    case 3:
-                        System.out.println("\n[ACTION] Recording Claim...");
-                        policy.recordClaim();
-                        System.out.println("\n[ACTION] recordClaim() called - claims is now " + policy.getClaimsCount());
-                        break;
-
                     case 4:
-                        System.out.println("\n[ACTION] Expiring Policy...");
-                        policy.expire();
+                        verifyPolicySelected(currentPolicy);
+                        System.out.println("\n[ACTION] Recording Claim...");
+                        currentPolicy.recordClaim();
+                        System.out.println("\n[ACTION] recordClaim() called - claims is now " + currentPolicy.getClaimsCount());
                         break;
 
                     case 5:
+                        verifyPolicySelected(currentPolicy);
+                        System.out.println("\n[ACTION] Expiring Policy...");
+                        currentPolicy.expire();
+                        break;
+
+                    case 6:
+                        verifyPolicySelected(currentPolicy);
                         System.out.println("\n[ACTION] Renewing Policy...");
                         System.out.println("Enter date of renewal (in dd/MM/yyyy format): ");
                         String renewalDate = detailsScanner.nextLine();
                         LocalDate parsedRenewalDate = parseDate(renewalDate);
-                        policy.renew(parsedRenewalDate);
-                        break;
-
-                    case 6:
-                        System.out.println(policy.getPolicyDetails());
+                        currentPolicy.renew(parsedRenewalDate);
                         break;
 
                     case 7:
+                        verifyPolicySelected(currentPolicy);
+                        System.out.println(currentPolicy.getPolicyDetails());
+                        break;
+
+                    case 8:
                         System.out.println("\nExiting System. Goodbye!");
                         exit = true;
                         break;
@@ -314,20 +334,40 @@ public class PremiumCalculator {
                         System.out.println("\n[ERROR] Invalid option. Please select 1-5.");
                         break;
                 }
+
+            } catch (NumberFormatException e) {
+                String finalPolicyNumber = (policyNumber != null) ? policyNumber : "UNKNOWN";
+                throw new InvalidPolicyDataException(finalPolicyNumber, "Invalid Numeric Input provided!");
+            } catch (PolicyNotFoundException e) {
+                System.out.println(
+                        String.format("REFUSED [%s] %s : %s", e.getClass().getSimpleName(), e.getPolicyNumber(), e.getMessage())
+                );
+            } catch (PolicyBusinessException e) {
+                System.out.println(
+                        String.format("REFUSED [%s] %s: %s", e.getClass().getSimpleName(), e.getPolicyNumber(), e.getMessage())
+                );
             }
-        } catch (NumberFormatException e) {
-            String finalPolicyNumber = (policyNumber != null) ? policyNumber : "UNKNOWN";
-            throw new InvalidPolicyDataException(finalPolicyNumber, "Invalid Numeric Input provided!");
+
+
         }
+    }
 
 
+    private static void verifyPolicySelected(Policy currentPolicy) throws InvalidPolicyDataException {
+        if (currentPolicy == null) {
+            throw new InvalidPolicyDataException(
+                    "UNKNOWN",
+                    "Please select a policy first.");
+        }
     }
 
     /**
      * It parses date in the required format and checks for any invalid date strings. Returns {@link LocalDate} object parsed from the given input string.
+     *
      * @param date
      * @return {@link LocalDate parsedDate}
      */
+
     private static LocalDate parseDate(String date) {
         String dateFormat = "dd/MM/uuuu";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withResolverStyle(ResolverStyle.STRICT);
@@ -336,31 +376,37 @@ public class PremiumCalculator {
         return parsedDate;
     }
 
-
     public static PolicyHolder addNewPolicyHolder(Scanner scn) {
-        String firstName, lastName;
+        try {
+            String firstName, lastName;
 
-        System.out.print("Enter your first name >> ");
-        firstName = scn.nextLine();
+            System.out.print("Enter your first name >> ");
+            firstName = scn.nextLine();
 
-        System.out.print("Enter your last name >> ");
-        lastName = scn.nextLine();
-
-
-        System.out.print("Enter your age >> ");
-        int age = scn.nextInt();
-        scn.nextLine();
-        PolicyValidator.validateAge(age);
-
-        System.out.println("\nSelect your jurisdiction from the following choices >> ");
-        System.out.print("1.Illinois(IS)\t2.Indiana(IN)\t3.Minnesota(MN) (Enter respective number): ");
-        System.out.print(">>");
-        State personState = State.getStateFromChoice(Integer.parseInt(scn.nextLine().trim()));
+            System.out.print("Enter your last name >> ");
+            lastName = scn.nextLine();
 
 
-        PolicyHolder policyHolder = new PolicyHolder(firstName, lastName, age, personState);
-        System.out.println("Account created successfully! Your userID is: " + policyHolder.getUserID());
+            System.out.print("Enter your age >> ");
+            int age = scn.nextInt();
+            scn.nextLine();
+            PolicyValidator.validateAge(age);
 
-        return policyHolder;
+            System.out.println("\nSelect your jurisdiction from the following choices >> ");
+            System.out.print("1.Illinois(IS)\t2.Indiana(IN)\t3.Minnesota(MN) (Enter respective number): ");
+            System.out.print(">>");
+            State personState = State.getStateFromChoice(Integer.parseInt(scn.nextLine().trim()));
+
+
+            PolicyHolder policyHolder = new PolicyHolder(firstName, lastName, age, personState);
+            System.out.println("Account created successfully! Your userID is: " + policyHolder.getUserID());
+
+            return policyHolder;
+        } catch (IllegalArgumentException e) {
+            throw new InvalidPolicyDataException("UNKNOWN",
+                    String.format("Invalid input provided for policyholder details!\nError: %s", e.getMessage(), e)
+            );
+        }
+
     }
 }

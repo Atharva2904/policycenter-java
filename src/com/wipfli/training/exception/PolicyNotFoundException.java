@@ -2,12 +2,15 @@ package com.wipfli.training.exception;
 
 public class PolicyNotFoundException extends Exception{
 
-    public PolicyNotFoundException(String message) {
+    private final String policyNumber;
+
+    public PolicyNotFoundException(String policyNumber, String message) {
         super(message);
+        this.policyNumber = policyNumber;
     }
 
-    public PolicyNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
 
+    public String getPolicyNumber() {
+        return policyNumber;
+    }
 }
