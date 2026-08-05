@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class StandardPremiumCalculator implements PremiumCalculable {
 
-    private static final BigDecimal COST_PER_CLAIM = new BigDecimal("150.0");
+    private static final Double COST_PER_CLAIM = 150.0;
     private final AgeGroupFactorStore ageGroupFactorStore;
 
     public StandardPremiumCalculator(AgeGroupFactorStore ageGroupFactorStore){
@@ -17,19 +17,21 @@ public class StandardPremiumCalculator implements PremiumCalculable {
 
 
     @Override
-    public BigDecimal calculatePremium(Policy policy) {
-        if(policy == null || policy.getVehicleType() == null || policy.getPolicyHolder() == null){
-            return BigDecimal.ZERO;
+    public Double calculatePremium(Policy policy) {
+        if (policy == null || policy.getVehicleType() == null || policy.getPolicyHolder() == null) {
+            return 0.0;
         }
 
         int age = (int) policy.getPolicyHolder().getAge();
         int numberOfClaims = policy.getClaimsCount();
 
-        BigDecimal basePremium = BigDecimal.valueOf(policy.getVehicleType().getBasePremium());
-        BigDecimal ageFactor = BigDecimal.valueOf(ageGroupFactorStore.getFactor(age));
-        BigDecimal crashCost = COST_PER_CLAIM.multiply(BigDecimal.valueOf(numberOfClaims));
+        Double basePremium = Double.valueOf(policy.getVehicleType().getBasePremium());
+        Double ageFactor = Double.valueOf(ageGroupFactorStore.getFactor(age));
+        Double crashCost = COST_PER_CLAIM * numberOfClaims;
 
-        BigDecimal ageSurcharge = basePremium.multiply(ageFactor);
-        return basePremium.add(ageSurcharge).add(crashCost);
+        Double ageSurcharge = basePremium * (ageFactor);
+        Double totalPremium = basePremium + (ageSurcharge) + (crashCost);
+
+        return totalPremium;
     }
 }
