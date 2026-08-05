@@ -87,6 +87,10 @@ public abstract class Policy {
         return vehicleType;
     }
 
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
     /**
      * This method checks if the policy status can be set to EXPIRED.
      * A policy status can only be set to EXPIRED if it is in ACTIVE state
@@ -212,6 +216,26 @@ public abstract class Policy {
 
 
     public abstract String getPolicyDetails();
+
+    protected String getCommonDetails(){
+        return String.format("""
+    ======================================
+    POLICY DETAILS
+    ======================================
+    Policy Number:       %s
+    Customer Name:       %s
+    Status:              %s
+    Expiry Date:         %s
+    Claims Count:        %d
+    """,
+                getPolicyNumber(),
+                getPolicyHolder().getDisplayName(),
+                getPolicyStatus(),
+                getExpiryDate(),
+                getClaimsCount()
+        );
+
+    }
 
 
 

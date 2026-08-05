@@ -17,8 +17,13 @@ public class BikePolicy extends Policy {
 
     @Override
     public String getPolicyDetails() {
-        return String.format("Policy: %s| Customer Name: %s| Status: %s| Vehicle: %s| Engine CC: %s",
-                getPolicyNumber(), getPolicyHolder().getDisplayName(), getPolicyStatus(), getVehicleType(), getEngineCC()
+        return getCommonDetails() + String.format("""
+            Vehicle Type:        %s
+            Engine CC:           %s
+            ======================================
+            """,
+                VehicleType.BIKE,
+                getEngineCC()
         );
     }
 }

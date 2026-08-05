@@ -20,9 +20,14 @@ public class CarPolicy extends Policy{
 
     @Override
     public String getPolicyDetails() {
-        return String.format("Policy: %s| Customer Name: %s| Status: %s| Vehicle: %s| Registration Number: %s",
-                getPolicyNumber(), getPolicyHolder().getDisplayName(), getPolicyStatus(), VehicleType.CAR, getRegistrationNumber()
-                );
+        return getCommonDetails() + String.format("""
+            Vehicle Type:        %s
+            Registration No:     %s
+            ======================================
+            """,
+                VehicleType.CAR,
+                getRegistrationNumber()
+        );
     }
 
 }
