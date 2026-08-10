@@ -231,7 +231,7 @@ public abstract class Policy {
                 getPolicyNumber(),
                 getPolicyHolder().getDisplayName(),
                 getPolicyStatus(),
-                getExpiryDate(),
+                getExpiryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                 getClaimsCount()
         );
 

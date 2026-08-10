@@ -36,11 +36,16 @@ public class PremiumCalculator {
      */
     private static void run(Scanner detailsScanner)  {
         boolean exit = false;
-
+        boolean isSeeded = false;
         printHeader("Policy Register");
 
         while (!exit) {
             try {
+                if(!isSeeded) {
+                    seedDemoPolicies();
+                    isSeeded = true;
+                }
+
                 System.out.println();
                 System.out.println("----- Main Menu -----");
                 System.out.println("  1. Add Policy");
@@ -93,10 +98,10 @@ public class PremiumCalculator {
         printHeader("Policies for " + customerName);
         if (customerPolicies.isEmpty()) return;
 
-        customerPolicies.forEach(policy -> {
-            System.out.println(policy.getPolicyDetails());
+        for(Policy p: customerPolicies){
+            System.out.println(p.getPolicyDetails());
             printSeparator();
-        });
+        }
     }
 
     private static void handleViewPoliciesByVehicleType(Scanner scanner) throws PolicyNotFoundException {
@@ -112,10 +117,10 @@ public class PremiumCalculator {
 
         if (vehiclePolicies.isEmpty()) return;
 
-        vehiclePolicies.forEach(policy -> {
-            System.out.println(policy.getPolicyDetails());
+        for(Policy p: vehiclePolicies){
+            System.out.println(p.getPolicyDetails());
             printSeparator();
-        });
+        }
     }
 
     private static void handleViewPoliciesExpiringSoon(Scanner scanner) {
@@ -133,9 +138,13 @@ public class PremiumCalculator {
             System.out.println("No policies expiring within the specified period.");
             return;
         }
-        expiringPolicies.forEach(policy ->
-                System.out.printf("Policy: %-15s | Expiry: %s%n", policy.getPolicyNumber(), policy.getExpiryDate())
-        );
+
+        for(Policy p: expiringPolicies){
+            System.out.printf("Policy: %-15s | Expiry: %s%n", p.getPolicyNumber(), p.getExpiryDate());
+        }
+
+        printSeparator();
+
     }
 
     private static void handleViewSummaryByVehicleType() {
@@ -146,9 +155,11 @@ public class PremiumCalculator {
             System.out.println("No policies available for premium summary.");
             return;
         }
-        premiumSummary.forEach((type, totalPremium) ->
-                System.out.printf("%-10s >> $%,.2f%n", type, totalPremium)
-        );
+
+        for(Map.Entry<VehicleType, Double> entry : premiumSummary.entrySet()) {
+            System.out.printf("%-10s >> $%,.2f%n", entry.getKey(), entry.getValue());
+        }
+        printSeparator();
     }
 
     /**
@@ -397,6 +408,36 @@ public class PremiumCalculator {
     }
 
 
+    private static void seedDemoPolicies() throws PolicyNotFoundException{
+        LocalDate futureExpiry1 = LocalDate.now().plusMonths(6);
+        LocalDate futureExpiry2 = LocalDate.now().plusMonths(9);
+        LocalDate futureExpiry3 = LocalDate.now().plusDays(15);
+
+        PolicyHolder userAtharva = new PolicyHolder("Atharva", "Ghanekar", 23, State.IS);
+        PolicyHolder userPeter = new PolicyHolder("Peter", "Parker", 25, State.IN);
+        PolicyHolder userFrank = new PolicyHolder("Frank", "Castle", 28, State.MN);
+        PolicyHolder userSteve = new PolicyHolder("Steve", "Rogers", 55, State.IS);
+        PolicyHolder userBruce = new PolicyHolder("Bruce", "Banner", 45, State.IN);
+        PolicyHolder userNovak = new PolicyHolder("Novak", "Djokovic", 39, State.MN);
+
+        CarPolicy car1 = new CarPolicy("CAR-2026-001", userPeter, "IL-ABC-123", futureExpiry1);
+        CarPolicy car2 = new CarPolicy("CAR-2026-002", userAtharva, "IN-XYZ-789", futureExpiry2);
+
+        BikePolicy bike1 = new BikePolicy("BIK-2026-003", userFrank, 150, futureExpiry1);
+        BikePolicy bike2 = new BikePolicy("BIK-2026-004", userSteve, 650, futureExpiry3);
+
+        TruckPolicy truck1 = new TruckPolicy("TRK-2026-005", userBruce, 12.5, futureExpiry2);
+        TruckPolicy truck2 = new TruckPolicy("TRK-2026-006", userNovak, 25.0, futureExpiry3);
+
+        List<Policy> demoPolicies = List.of(car1, car2, bike1, bike2, truck1, truck2);
+
+        for (Policy policy : demoPolicies) {
+            PolicyValidator.validate(policy);
+            policyRegisterService.add(policy);
+        }
+
+        printSuccess("Seeded " + demoPolicies.size() + " demo policies.");
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.wipfli.training.service;
 
 import com.wipfli.training.exception.DuplicatePolicyNumberException;
+import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.exception.PolicyNotFoundException;
 import com.wipfli.training.model.Policy;
 import com.wipfli.training.model.PremiumCalculable;
@@ -10,10 +11,10 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class PolicyRegister {
-    private final Hashtable<String, Policy> policyHashtable;
-    private final Hashtable<String, List<Policy>> policiesByCustomerName;
+    private final Map<String, Policy> policyHashtable;
+    private final Map<String, List<Policy>> policiesByCustomerName;
     private final EnumMap<VehicleType, List<Policy>> policiesByVehicleType;
-    private final TreeMap<LocalDate, List<Policy>> policiesByExpiryDate;
+    private final NavigableMap<LocalDate, List<Policy>> policiesByExpiryDate;
 
 
     public PolicyRegister() {
@@ -25,6 +26,11 @@ public class PolicyRegister {
 
 
     public void add(Policy policy) {
+        if(policy == null){
+            throw new InvalidPolicyDataException("NULL_POLICY",
+                    "Policy object cannot be null!!");
+        }
+
         String policyNumber = policy.getPolicyNumber();
         String customerName = policy.getPolicyHolder().getDisplayName();
         VehicleType vehicleType = policy.getVehicleType();
@@ -83,7 +89,7 @@ public class PolicyRegister {
 
         if (policyListGroupedByVehicleType == null) {
             System.out.printf("[LOG]: No policy records found for the vehicle type '%s'%n", vehicleType);
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return policyListGroupedByVehicleType;
@@ -98,9 +104,17 @@ public class PolicyRegister {
         // This method returns a view of the portion of this map whose keys range from currentDate (inclusive) to targetDate (inclusive).
         // We then iterate over the values of this subMap and add all the policies to our result list.
 
+        for(Map.Entry<LocalDate, List<Policy>> entry: policiesByExpiryDate.subMap(targetDate.minusDays(1), true, targetDate, true).entrySet()){
+            policiesExpiringWithinDays.addAll(entry.getValue());
+        }
+
+        /*
+
         policiesByExpiryDate.subMap(todayDate, true, targetDate, true)
                 .values()
                 .forEach(policiesExpiringWithinDays::addAll);
+
+         */
 
 
         return policiesExpiringWithinDays;
