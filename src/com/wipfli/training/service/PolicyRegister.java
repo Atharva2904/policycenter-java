@@ -9,12 +9,15 @@ import com.wipfli.training.model.VehicleType;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PolicyRegister {
     private final Map<String, Policy> policyHashtable;
     private final Map<String, List<Policy>> policiesByCustomerName;
     private final EnumMap<VehicleType, List<Policy>> policiesByVehicleType;
     private final NavigableMap<LocalDate, List<Policy>> policiesByExpiryDate;
+    private final LocalDate REFERENCE_DATE = LocalDate.of(2026, 8, 9);
+
 
 
     public PolicyRegister() {
@@ -26,7 +29,7 @@ public class PolicyRegister {
 
 
     public void add(Policy policy) {
-        if(policy == null){
+        if (policy == null) {
             throw new InvalidPolicyDataException("NULL_POLICY",
                     "Policy object cannot be null!!");
         }
@@ -58,45 +61,33 @@ public class PolicyRegister {
 
     }
 
-    public Policy findByNumber(String policyNumber) throws PolicyNotFoundException {
-
-        Policy policy = policyHashtable.get(policyNumber);
-
-        if (policy == null) {
-            throw new PolicyNotFoundException(
-                    policyNumber,
-                    String.format("Policy with number %s not found!", policyNumber)
-            );
-        }
-
-        return policy;
+    public Optional<Policy> findByNumber(String policyNumber) {
+        return Optional.ofNullable(policyHashtable.get(policyNumber));
 
     }
 
-    public List<Policy> findByCustomer(String customerName)  {
-        List<Policy> policyListGroupedByCustomer = policiesByCustomerName.get(customerName);
+    public List<Policy> findByCustomer(String customerName) {
+        /*
+            Optional.ofNullable() method is used to handle the null values gracefully without the risk of encountering a NullPointerException.
+            If .get() returns a null value, the Optional.ofNullable() wraps it inside an empty Optional Object
+            The orElse() detects that Optional is Empty and replaces the empty value with an immutable Empty List
+         */
 
-        if (policyListGroupedByCustomer == null) {
-            System.out.printf("[LOG]: No policy records found for the customer '%s'%n", customerName);
-            return new ArrayList<>();
-        }
+        List<Policy> policyListGroupedByCustomer = Optional.ofNullable(policiesByCustomerName.get(customerName))
+                .orElse(Collections.emptyList());
 
         return policyListGroupedByCustomer;
     }
 
     public List<Policy> findByVehicleType(VehicleType vehicleType) {
-        List<Policy> policyListGroupedByVehicleType = policiesByVehicleType.get(vehicleType);
-
-        if (policyListGroupedByVehicleType == null) {
-            System.out.printf("[LOG]: No policy records found for the vehicle type '%s'%n", vehicleType);
-            return Collections.emptyList();
-        }
+        List<Policy> policyListGroupedByVehicleType = Optional.ofNullable(policiesByVehicleType.get(vehicleType))
+                .orElse(Collections.emptyList());
 
         return policyListGroupedByVehicleType;
     }
 
-    public List<Policy> findExpiringWithinDays(int days, LocalDate todayDate) {
-        LocalDate targetDate = todayDate.plusDays(days);
+    public List<Policy> findExpiringWithinDays(int days) {
+        LocalDate targetDate = this.REFERENCE_DATE.plusDays(days);
 
         List<Policy> policiesExpiringWithinDays = new ArrayList<>();
 
@@ -104,17 +95,10 @@ public class PolicyRegister {
         // This method returns a view of the portion of this map whose keys range from currentDate (inclusive) to targetDate (inclusive).
         // We then iterate over the values of this subMap and add all the policies to our result list.
 
-        for(Map.Entry<LocalDate, List<Policy>> entry: policiesByExpiryDate.subMap(targetDate.minusDays(1), true, targetDate, true).entrySet()){
-            policiesExpiringWithinDays.addAll(entry.getValue());
-        }
 
-        /*
-
-        policiesByExpiryDate.subMap(todayDate, true, targetDate, true)
+        policiesByExpiryDate.subMap(REFERENCE_DATE, false, targetDate, true)
                 .values()
                 .forEach(policiesExpiringWithinDays::addAll);
-
-         */
 
 
         return policiesExpiringWithinDays;
@@ -125,18 +109,86 @@ public class PolicyRegister {
         PremiumCalculable premiumCalculator = new NoClaimBonusCalculator();
         Hashtable<VehicleType, Double> totalPremiumGroupedByVehicleType = new Hashtable<>();
 
-        for (Map.Entry<VehicleType, List<Policy>> entry : policiesByVehicleType.entrySet()) {
-            VehicleType vehicleType = entry.getKey();
-            List<Policy> policyList = entry.getValue();
+        /*
+            .sum() is a method provided by the Stream API in Java. It is used to calculate the sum of a stream of numeric values.
+            The Collections objects in Java do not contain this method. Hence, we need to convert these collections objects to a Stream object
+            specifically before we can operate on them. It is done using .stream() method
 
-            double totalPremiumSumByVehicleType = 0;
-            for (Policy p : policyList) {
-                totalPremiumSumByVehicleType += premiumCalculator.calculatePremium(p);
-            }
-            totalPremiumGroupedByVehicleType.put(vehicleType, totalPremiumSumByVehicleType);
-        }
+         */
+        policiesByVehicleType.forEach((vehicleType, policies) ->
+                totalPremiumGroupedByVehicleType.put(vehicleType, policies.stream()
+                        .mapToDouble(p -> premiumCalculator.calculatePremium(p))
+                        .sum()
+                )
+        );
 
 
         return totalPremiumGroupedByVehicleType;
     }
+
+    public Hashtable<VehicleType, Integer> countPoliciesByVehicleType() {
+        Hashtable<VehicleType, Integer> countOfPoliciesGroupedByVehicleType = new Hashtable<>();
+
+        policiesByVehicleType.forEach(((vehicleType, policies) -> countOfPoliciesGroupedByVehicleType.put(vehicleType, policies.size())));
+        return countOfPoliciesGroupedByVehicleType;
+    }
+
+    public Optional<String> getCustomerWithMostPolicies() {
+
+        return policiesByCustomerName.entrySet().stream()
+                .max(Comparator.comparingInt(entry -> entry.getValue().size()))
+                .map(Map.Entry::getKey);
+    }
+
+    public Map<String, Double> getTop5PoliciesByPremium() {
+        PremiumCalculable premiumCalculator = new NoClaimBonusCalculator();
+
+
+        return policyHashtable.values().stream()
+                .map(policy -> Map.entry(policy.getPolicyNumber(), premiumCalculator.calculatePremium(policy)))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(5)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new
+                ));
+    }
+
+    public List<String> getCustomersWithMatchingPattern(String customerName) {
+        List<String> matchingCustomerNames = new ArrayList<>();
+        List<Policy> policyListForGivenCustomer = findByCustomer(customerName);
+
+        /*
+            The following code snippet uses the Stream API to group the policies by their class type and count the number of policies for each class type.
+            The result is a Map where the keys are the class types of the policies and the values are the counts of policies for each class type.
+            This map represents the "pattern" of policies for the given customer, which can then be compared to other customers' patterns to find matches.
+
+            This is for the query where we are required to find customers having similar policies/ same count of policies as per the given customer
+         */
+
+        Map<Class<? extends Policy>, Long> targetPattern = policyListForGivenCustomer.stream()
+                .collect(Collectors.groupingBy(
+                        Policy::getClass,
+                        Collectors.counting()
+                ));
+
+
+        policiesByCustomerName.forEach((customer, policies) -> {
+            Map<Class<? extends Policy>, Long> currentPattern = policies.stream()
+                    .collect(Collectors.groupingBy(
+                            Policy::getClass,
+                            Collectors.counting()
+                    ));
+
+            if (currentPattern.equals(targetPattern)) matchingCustomerNames.add(customer);
+
+        });
+
+
+        return matchingCustomerNames;
+    }
+
+
 }
