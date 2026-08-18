@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PremiumCalculator {
     public static PolicyRegister policyRegisterService = new PolicyRegister();
@@ -49,29 +50,39 @@ public class PremiumCalculator {
                 System.out.println();
                 System.out.println("----- Main Menu -----");
                 System.out.println("  1. Add Policy");
-                System.out.println("  2. View Policies for a Customer");
-                System.out.println("  3. View Policies by Vehicle Type");
-                System.out.println("  4. View Policies Expiring Soon");
-                System.out.println("  5. View Premium Summary by Vehicle Type");
-                System.out.println("  6. Clear Console");
-                System.out.println("  7. Exit");
+                System.out.println("  2. View Policy Details");
+                System.out.println("  3. View Policies for a Customer");
+                System.out.println("  4. View Policies by Vehicle Type");
+                System.out.println("  5. View Policies Expiring Soon");
+                System.out.println("  6. View Premium Summary by Vehicle Type");
+                System.out.println("  7. View Number of Policies by Vehicle Type");
+                System.out.println("  8. View Customer with Most Policies");
+                System.out.println("  9. View Top 5 Policies by Premium");
+                System.out.println("  10. View Customers having similar policy records");
+                System.out.println("  11. Clear Console");
+                System.out.println("  12. Exit");
                 System.out.print("Enter choice >> ");
 
                 int choice = Integer.parseInt(detailsScanner.nextLine().trim());
 
                 switch (choice) {
                     case 1 -> simulatePolicyDetailsInput(detailsScanner);
-                    case 2 -> handleViewPoliciesForCustomer(detailsScanner);
-                    case 3 -> handleViewPoliciesByVehicleType(detailsScanner);
-                    case 4 -> handleViewPoliciesExpiringSoon(detailsScanner);
-                    case 5 -> handleViewSummaryByVehicleType();
-                    case 6 -> clearConsole();
-                    case 7 -> {
+                    case 2 -> handleViewPolicyDetails(detailsScanner);
+                    case 3 -> handleViewPoliciesForCustomer(detailsScanner);
+                    case 4 -> handleViewPoliciesByVehicleType(detailsScanner);
+                    case 5 -> handleViewPoliciesExpiringSoon(detailsScanner);
+                    case 6 -> handleViewSummaryByVehicleType();
+                    case 7 -> handleNumberOfPoliciesPerVehicleType();
+                    case 8 -> handleViewCustomerWithMostPolicies();
+                    case 9 -> handleViewHighestPremiumPolicies();
+                    case 10 -> handleViewCustomersWithSimilarPolicyRecords(detailsScanner);
+                    case 11 -> clearConsole();
+                    case 12 -> {
                         System.out.println();
                         printSuccess("Exiting Policy Register. Goodbye!");
                         exit = true;
                     }
-                    default -> printError("Invalid option. Please select 1-7.");
+                    default -> printError("Invalid option. Please select 1-11.");
                 }
 
             } catch (NumberFormatException e) {
@@ -83,6 +94,19 @@ public class PremiumCalculator {
             } catch (PolicyBusinessException e) {
                 printRefused(e);
             }
+        }
+    }
+
+    private static void handleViewPolicyDetails(Scanner scanner){
+        System.out.println("Enter Policy Number >> ");
+        String policyNumber = scanner.nextLine().trim();
+        Optional<Policy> currentPolicy = policyRegisterService.findByNumber(policyNumber);
+
+        if(currentPolicy.isPresent()){
+            System.out.println(currentPolicy.get().getPolicyDetails());
+        }
+        else{
+            System.out.println("No policy found with number: " + policyNumber);
         }
     }
 
@@ -127,11 +151,8 @@ public class PremiumCalculator {
         System.out.print("Enter number of days >> ");
         int days = Integer.parseInt(scanner.nextLine().trim());
 
-        System.out.println("Enter today's date (in dd/MM/yyyy format) >> ");
-        String todayDateString = scanner.nextLine().trim();
-        LocalDate todayDate = parseDate(todayDateString);
 
-        List<Policy> expiringPolicies = policyRegisterService.findExpiringWithinDays(days, todayDate);
+        List<Policy> expiringPolicies = policyRegisterService.findExpiringWithinDays(days);
 
         printHeader("Policies Expiring Within " + days + " Days");
         if (expiringPolicies.isEmpty()) {
@@ -162,6 +183,84 @@ public class PremiumCalculator {
         printSeparator();
     }
 
+    private static void handleNumberOfPoliciesPerVehicleType(){
+        Map<VehicleType, Integer> policyCountPerVehicleType = policyRegisterService.countPoliciesByVehicleType();
+
+        if(policyCountPerVehicleType.isEmpty()){
+            System.out.println("No policies available.");
+            return;
+        }
+
+        printHeader("Number of Policies by Vehicle Type");
+        policyCountPerVehicleType.forEach(((vehicleType, integer) -> {
+            System.out.printf("%-10s --> %d%n", vehicleType, integer);
+        }));
+
+        printSeparator();
+    }
+
+    private static void handleViewCustomerWithMostPolicies(){
+        Optional<String> customerWithMostPolicies = policyRegisterService.getCustomerWithMostPolicies();
+
+        if(!customerWithMostPolicies.isPresent()){
+            System.out.println("No customer found with most policies.");
+            return;
+        }
+
+        printHeader("Customer with most no. of policies: ");
+        System.out.println(customerWithMostPolicies.get());
+        printSeparator();
+
+    }
+
+    private static void handleViewHighestPremiumPolicies(){
+        Map<String, Double> highestPremiumPolicies = policyRegisterService.getTop5PoliciesByPremium();
+
+        if(highestPremiumPolicies.isEmpty()){
+            System.out.println("No policies found.");
+            return;
+        }
+
+        printHeader("Top 5 Policies by Premium");
+
+        // Java's Lambda expressions can only access local variables which are "effectively final"
+        // A final variable is the one whose value never changes after initialization
+
+        // Instead we can create an object of AtomicInteger which holds an integer value inside it.
+        // Since the data that it holds is modified and not the reference to the object itself, it is allowed to be used inside a lambda expression.
+
+        AtomicInteger count = new AtomicInteger(1);
+
+
+        highestPremiumPolicies.forEach((policyNumber, premium) -> {
+                    System.out.printf("%d] %s%n", count.getAndIncrement(), policyNumber);
+                    System.out.printf("Premium: $%,.2f%n", premium);
+                }
+                );
+
+
+        printSeparator();
+
+
+    }
+
+    private static void handleViewCustomersWithSimilarPolicyRecords(Scanner scanner){
+        System.out.print("Enter customer first name >> ");
+        String firstName = scanner.nextLine().trim();
+        System.out.print("Enter customer last name >> ");
+        String lastName = scanner.nextLine().trim();
+
+        String customerName = firstName + " " + lastName;
+
+        List<String> customersWithSimilarPolicyRecords = policyRegisterService.getCustomersWithMatchingPattern(customerName);
+        if (customersWithSimilarPolicyRecords.isEmpty()) {
+            System.out.println("No customers found with similar policy records.");
+        } else {
+            printHeader("Customers with similar policy records");
+            customersWithSimilarPolicyRecords.forEach(System.out::println);
+            printSeparator();
+        }
+    }
     /**
      * It is a helper function which is responsible for collecting details regarding {@link CarPolicy}
      * It keeps the input loop running till valid policy details are not entered.
@@ -409,27 +508,24 @@ public class PremiumCalculator {
 
 
     private static void seedDemoPolicies() throws PolicyNotFoundException{
-        LocalDate futureExpiry1 = LocalDate.now().plusMonths(6);
-        LocalDate futureExpiry2 = LocalDate.now().plusMonths(9);
-        LocalDate futureExpiry3 = LocalDate.now().plusDays(15);
+        PolicyHolder userRavi = new PolicyHolder("Ravi", "Kumar", 22, State.IS);
+        PolicyHolder userMeena = new PolicyHolder("Meena", "Iyer", 34, State.IN);
+        PolicyHolder userAjay = new PolicyHolder("Ajay", "Verma", 41, State.MN);
+        PolicyHolder userSneha = new PolicyHolder("Sneha", "Rao", 29, State.IS);
 
-        PolicyHolder userAtharva = new PolicyHolder("Atharva", "Ghanekar", 23, State.IS);
-        PolicyHolder userPeter = new PolicyHolder("Peter", "Parker", 25, State.IN);
-        PolicyHolder userFrank = new PolicyHolder("Frank", "Castle", 28, State.MN);
-        PolicyHolder userSteve = new PolicyHolder("Steve", "Rogers", 55, State.IS);
-        PolicyHolder userBruce = new PolicyHolder("Bruce", "Banner", 45, State.IN);
-        PolicyHolder userNovak = new PolicyHolder("Novak", "Djokovic", 39, State.MN);
+        CarPolicy car1 = new CarPolicy("POL-2001", userRavi, "IL-ABC-123", 1, LocalDate.of(2026, 8, 15));
+        CarPolicy car2 = new CarPolicy("POL-2004", userAjay, "IN-XYZ-789", 0, LocalDate.of(2027, 1, 10));
+        CarPolicy car3 = new CarPolicy("POL-2006", userRavi, "IL-ABC-123", 3, LocalDate.of(2026, 12, 1));
 
-        CarPolicy car1 = new CarPolicy("CAR-2026-001", userPeter, "IL-ABC-123", futureExpiry1);
-        CarPolicy car2 = new CarPolicy("CAR-2026-002", userAtharva, "IN-XYZ-789", futureExpiry2);
 
-        BikePolicy bike1 = new BikePolicy("BIK-2026-003", userFrank, 150, futureExpiry1);
-        BikePolicy bike2 = new BikePolicy("BIK-2026-004", userSteve, 650, futureExpiry3);
+        BikePolicy bike1 = new BikePolicy("POL-2003", userMeena, 150, 2, LocalDate.of(2026, 8, 20));
+        BikePolicy bike2 = new BikePolicy("POL-2005", userSneha, 650, 0,  LocalDate.of(2026, 8, 25));
 
-        TruckPolicy truck1 = new TruckPolicy("TRK-2026-005", userBruce, 12.5, futureExpiry2);
-        TruckPolicy truck2 = new TruckPolicy("TRK-2026-006", userNovak, 25.0, futureExpiry3);
 
-        List<Policy> demoPolicies = List.of(car1, car2, bike1, bike2, truck1, truck2);
+        TruckPolicy truck1 = new TruckPolicy("POL-2002", userRavi, 12.5,0, LocalDate.of(2026, 9, 1));
+
+
+        List<Policy> demoPolicies = List.of(car1, car2, bike1, bike2, truck1, car3);
 
         for (Policy policy : demoPolicies) {
             PolicyValidator.validate(policy);
