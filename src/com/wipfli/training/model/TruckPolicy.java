@@ -18,7 +18,11 @@ public class TruckPolicy extends Policy {
     private static final int TRUCK_AGE_LIMIT = 21;
 
     public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, LocalDate expiryDate) {
-        super(policyNumber, policyHolder, VehicleType.TRUCK, expiryDate);
+        this(policyNumber, policyHolder, loadCapacityTons, 0, expiryDate);
+    }
+
+    public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, int previousClaimsCount, LocalDate expiryDate) {
+        super(policyNumber, policyHolder, VehicleType.TRUCK, previousClaimsCount, expiryDate);
 
         // Special Case: For a truck-driver, the minimum age limit is 21.
         if (policyHolder.getAge() < TRUCK_AGE_LIMIT) {

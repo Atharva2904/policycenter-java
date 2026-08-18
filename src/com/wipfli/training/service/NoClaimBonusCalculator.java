@@ -31,7 +31,7 @@ public class NoClaimBonusCalculator implements PremiumCalculable {
         Double totalPremium = basePremium + (ageSurcharge) + (crashCost);
 
         if (numberOfClaims == 0)
-            totalPremium = totalPremium - (totalPremium * (Double) (0.1));
+            totalPremium = totalPremium - (totalPremium * (0.1));
 
         return totalPremium;
     }

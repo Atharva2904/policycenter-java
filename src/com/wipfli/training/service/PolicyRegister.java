@@ -160,13 +160,6 @@ public class PolicyRegister {
         List<String> matchingCustomerNames = new ArrayList<>();
         List<Policy> policyListForGivenCustomer = findByCustomer(customerName);
 
-        /*
-            The following code snippet uses the Stream API to group the policies by their class type and count the number of policies for each class type.
-            The result is a Map where the keys are the class types of the policies and the values are the counts of policies for each class type.
-            This map represents the "pattern" of policies for the given customer, which can then be compared to other customers' patterns to find matches.
-
-            This is for the query where we are required to find customers having similar policies/ same count of policies as per the given customer
-         */
 
         Map<Class<? extends Policy>, Long> targetPattern = policyListForGivenCustomer.stream()
                 .collect(Collectors.groupingBy(

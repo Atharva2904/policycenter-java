@@ -7,7 +7,11 @@ public class BikePolicy extends Policy {
     private int engineCC;
 
     public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, LocalDate expiryDate){
-        super(policyNumber, policyHolder, VehicleType.BIKE, expiryDate);
+        this(policyNumber, policyHolder, engineCC, 0, expiryDate);
+    }
+
+    public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, int previousClaimsCount, LocalDate expiryDate){
+        super(policyNumber, policyHolder, VehicleType.BIKE, previousClaimsCount, expiryDate);
         this.engineCC = engineCC;
     }
 
