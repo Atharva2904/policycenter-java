@@ -61,7 +61,7 @@ public abstract class Policy {
         this.claimsCount = previousClaimsCount;
         this.createdAt = Instant.now();
         this.startDate = LocalDate.now();
-        this.expiryDate = parseAndValidate(expiryDate);
+        this.expiryDate = expiryDate;
         this.policyStatus = PolicyStatus.ACTIVE;
     }
 

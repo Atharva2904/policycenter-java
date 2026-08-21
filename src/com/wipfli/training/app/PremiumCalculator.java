@@ -82,7 +82,7 @@ public class PremiumCalculator {
                         printSuccess("Exiting Policy Register. Goodbye!");
                         exit = true;
                     }
-                    default -> printError("Invalid option. Please select 1-11.");
+                    default -> printError("Invalid option. Please select 1-12.");
                 }
 
             } catch (NumberFormatException e) {

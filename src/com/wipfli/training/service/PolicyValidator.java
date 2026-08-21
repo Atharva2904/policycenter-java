@@ -1,6 +1,7 @@
 package com.wipfli.training.service;
 
 import com.wipfli.training.exception.InvalidPolicyDataException;
+import com.wipfli.training.exception.PolicyBusinessException;
 import com.wipfli.training.exception.PolicyNotFoundException;
 import com.wipfli.training.model.Policy;
 
@@ -16,7 +17,7 @@ public class PolicyValidator {
 
     }
 
-    public static void validate(Policy policy) throws PolicyNotFoundException {
+    public static void validate(Policy policy) throws PolicyNotFoundException, PolicyBusinessException {
         if (policy == null) throw new PolicyNotFoundException("UNKNOWN", "Policy object cannot be null!");
 
         String policyNumber = policy.getPolicyNumber();
