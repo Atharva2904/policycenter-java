@@ -33,7 +33,11 @@ public class PolicyHolder {
     }
 
     private static String validateName(String name) {
-        if (name == null || !name.matches("[A-Za-z]+")) {
+        if(name == null || name.trim().isBlank()){
+            throw new IllegalArgumentException(String.format("Name cannot be NULL! Entered value: %s", name));
+        }
+
+        if (!name.matches("[A-Za-z]+")) {
             throw new IllegalArgumentException(String.format("Name cannot contain digits or special character! Entered value: %s", name));
         }
 

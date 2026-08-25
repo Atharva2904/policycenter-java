@@ -16,13 +16,6 @@ public enum VehicleType {
         this.code = code;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public double getFactor() {
-        return factor;
-    }
 
     public double getBasePremium() {
         return BASE_PREMIUM;
