@@ -4,8 +4,7 @@ import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.exception.PolicyBusinessException;
 import com.wipfli.training.exception.PolicyNotFoundException;
 import com.wipfli.training.model.*;
-import com.wipfli.training.service.PolicyRegister;
-import com.wipfli.training.service.PolicyValidator;
+import com.wipfli.training.service.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +14,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PremiumCalculator {
-    public static PolicyRegister policyRegisterService = new PolicyRegister();
+
+    private static PremiumCalculable STANDARD_PREMIUM_CALCULATOR = new StandardPremiumCalculator();
+    private static PremiumCalculable NO_CLAIM_BONUS_PREMIUM_CALCULATOR = new NoClaimBonusCalculator(STANDARD_PREMIUM_CALCULATOR);
+    public static PolicyRegister policyRegisterService = new PolicyRegister(NO_CLAIM_BONUS_PREMIUM_CALCULATOR);
 
     public static void main(String[] args) {
             try (Scanner detailsScanner = new Scanner(System.in)) {
@@ -286,7 +288,7 @@ public class PremiumCalculator {
             System.out.print("Enter expiry date (dd/MM/yyyy) >> ");
             LocalDate parsedExpiryDate = parseDate(scanner.nextLine().trim());
 
-            CarPolicy carPolicy = new CarPolicy(policyNumber, policyHolder, registrationNumber, parsedExpiryDate);
+            Policy carPolicy = PolicyFactory.createCarPolicy(policyNumber, policyHolder, registrationNumber, 0, parsedExpiryDate);
 
             PolicyValidator.validate(carPolicy);
             policyRegisterService.add(carPolicy);
@@ -331,7 +333,7 @@ public class PremiumCalculator {
             System.out.print("Enter expiry date (dd/MM/yyyy) >> ");
             LocalDate parsedExpiryDate = parseDate(scanner.nextLine().trim());
 
-            TruckPolicy truckPolicy = new TruckPolicy(policyNumber, policyHolder, loadCapacity, parsedExpiryDate);
+            Policy truckPolicy = PolicyFactory.createTruckPolicy(policyNumber, policyHolder, loadCapacity, 0, parsedExpiryDate);
 
             PolicyValidator.validate(truckPolicy);
             policyRegisterService.add(truckPolicy);
@@ -376,7 +378,7 @@ public class PremiumCalculator {
             System.out.print("Enter engine capacity (CC) >> ");
             int engineCapacity = Integer.parseInt(scanner.nextLine().trim());
 
-            BikePolicy bikePolicy = new BikePolicy(policyNumber, policyHolder, engineCapacity, parsedExpiryDate);
+            Policy bikePolicy = PolicyFactory.createBikePolicy(policyNumber, policyHolder, engineCapacity, 0, parsedExpiryDate);
 
             PolicyValidator.validate(bikePolicy);
             policyRegisterService.add(bikePolicy);
@@ -513,16 +515,16 @@ public class PremiumCalculator {
         PolicyHolder userAjay = new PolicyHolder("Ajay", "Verma", 41, State.MN);
         PolicyHolder userSneha = new PolicyHolder("Sneha", "Rao", 29, State.IS);
 
-        CarPolicy car1 = new CarPolicy("POL-2001", userRavi, "IL-ABC-123", 1, LocalDate.of(2026, 8, 15));
-        CarPolicy car2 = new CarPolicy("POL-2004", userAjay, "IN-XYZ-789", 0, LocalDate.of(2027, 1, 10));
-        CarPolicy car3 = new CarPolicy("POL-2006", userRavi, "IL-ABC-123", 3, LocalDate.of(2026, 12, 1));
+        Policy car1 = PolicyFactory.createCarPolicy("POL-2001", userRavi, "IL-ABC-123", 1, LocalDate.of(2026, 8, 15));
+        Policy car2 = PolicyFactory.createCarPolicy("POL-2004", userAjay, "IN-XYZ-789", 0, LocalDate.of(2027, 1, 10));
+        Policy car3 = PolicyFactory.createCarPolicy("POL-2006", userRavi, "IL-ABC-123", 3, LocalDate.of(2026, 12, 1));
 
 
-        BikePolicy bike1 = new BikePolicy("POL-2003", userMeena, 150, 2, LocalDate.of(2026, 8, 20));
-        BikePolicy bike2 = new BikePolicy("POL-2005", userSneha, 650, 0,  LocalDate.of(2026, 8, 25));
+        Policy bike1 = PolicyFactory.createBikePolicy("POL-2003", userMeena, 150, 2, LocalDate.of(2026, 8, 20));
+        Policy bike2 = PolicyFactory.createBikePolicy("POL-2005", userSneha, 650, 0, LocalDate.of(2026, 8, 25));
 
 
-        TruckPolicy truck1 = new TruckPolicy("POL-2002", userRavi, 12.5,0, LocalDate.of(2026, 9, 1));
+        Policy truck1 = PolicyFactory.createTruckPolicy("POL-2002", userRavi, 12.5, 0, LocalDate.of(2026, 9, 1));
 
 
         List<Policy> demoPolicies = List.of(car1, car2, bike1, bike2, truck1, car3);
