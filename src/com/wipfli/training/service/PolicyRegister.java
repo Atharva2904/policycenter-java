@@ -17,16 +17,17 @@ public class PolicyRegister {
     private final EnumMap<VehicleType, List<Policy>> policiesByVehicleType;
     private final NavigableMap<LocalDate, List<Policy>> policiesByExpiryDate;
     private final LocalDate REFERENCE_DATE = LocalDate.of(2026, 8, 9);
+    private PremiumCalculable premiumCalculator;
 
 
 
-    public PolicyRegister() {
+    public PolicyRegister(PremiumCalculable premiumCalculator) {
         policyHashtable = new Hashtable<>();
         policiesByCustomerName = new Hashtable<>();
         policiesByVehicleType = new EnumMap<>(VehicleType.class);
         policiesByExpiryDate = new TreeMap<>();
+        this.premiumCalculator = premiumCalculator;
     }
-
 
     public void add(Policy policy) {
         if (policy == null) {
@@ -106,7 +107,6 @@ public class PolicyRegister {
     }
 
     public Hashtable<VehicleType, Double> totalPremiumByVehicleType() {
-        PremiumCalculable premiumCalculator = new NoClaimBonusCalculator();
         Hashtable<VehicleType, Double> totalPremiumGroupedByVehicleType = new Hashtable<>();
 
         /*
@@ -141,7 +141,6 @@ public class PolicyRegister {
     }
 
     public Map<String, Double> getTop5PoliciesByPremium() {
-        PremiumCalculable premiumCalculator = new NoClaimBonusCalculator();
 
 
         return policyHashtable.values().stream()

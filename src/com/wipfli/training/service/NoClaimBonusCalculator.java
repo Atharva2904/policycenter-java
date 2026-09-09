@@ -7,11 +7,10 @@ import com.wipfli.training.store.AgeGroupFactorStore;
 import java.math.BigDecimal;
 
 public class NoClaimBonusCalculator implements PremiumCalculable {
-    private static final Double COST_PER_CLAIM = 150.0;
-    private final AgeGroupFactorStore ageGroupFactorStore;
+    private final PremiumCalculable STANDARD_PREMIUM_CALCULATOR;
 
-    public NoClaimBonusCalculator() {
-        this.ageGroupFactorStore = new AgeGroupFactorStore();
+    public NoClaimBonusCalculator(PremiumCalculable standardPremiumCalculator) {
+        this.STANDARD_PREMIUM_CALCULATOR = standardPremiumCalculator;
     }
 
     @Override
@@ -20,15 +19,13 @@ public class NoClaimBonusCalculator implements PremiumCalculable {
             return 0.0;
         }
 
-        int age = (int) policy.getPolicyHolder().getAge();
+        /*
+            This is an example of the Decorator Pattern. The NoClaimBonusCalculator class here acts as a decorator that adds additional functionality to the StandardPremiumCalculator class.
+            It calculates the total premium by first calculating the standard premium using the StandardPremiumCalculator, and then applying a 10% discount if there are no claims.
+         */
+
+        Double totalPremium = STANDARD_PREMIUM_CALCULATOR.calculatePremium(policy);
         int numberOfClaims = policy.getClaimsCount();
-
-        Double basePremium = Double.valueOf(policy.getVehicleType().getBasePremium());
-        Double ageFactor = Double.valueOf(ageGroupFactorStore.getFactor(age));
-        Double crashCost = COST_PER_CLAIM * numberOfClaims;
-
-        Double ageSurcharge = basePremium * (ageFactor);
-        Double totalPremium = basePremium + (ageSurcharge) + (crashCost);
 
         if (numberOfClaims == 0)
             totalPremium = totalPremium - (totalPremium * (0.1));
