@@ -3,24 +3,29 @@ package service;
 import com.wipfli.training.exception.DuplicatePolicyNumberException;
 import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.model.Policy;
+import com.wipfli.training.model.PremiumCalculable;
 import com.wipfli.training.model.VehicleType;
+import com.wipfli.training.service.NoClaimBonusCalculator;
 import com.wipfli.training.service.PolicyRegister;
+import com.wipfli.training.service.StandardPremiumCalculator;
 import fixtures.TestFixtures;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@ExtendWith(PremiumCalculableResolver.class)
 public class PolicyRegisterTest {
     private PolicyRegister POLICY_REGISTER;
 
     @BeforeEach
-    void setUp(){
-        POLICY_REGISTER = new PolicyRegister();
+    void setUp(PremiumCalculable premiumCalculator){
+        POLICY_REGISTER = new PolicyRegister(new NoClaimBonusCalculator(premiumCalculator));
         POLICY_REGISTER.add(TestFixtures.pol2001());
         POLICY_REGISTER.add(TestFixtures.pol2002());
         POLICY_REGISTER.add(TestFixtures.pol2003());
@@ -97,11 +102,11 @@ public class PolicyRegisterTest {
     }
 
     @Test
-    void policyRegister_findCustomerWithMostPolicies_returnsEmptyOptional(){
+    void policyRegister_findCustomerWithMostPolicies_returnsEmptyOptional(PremiumCalculable premiumCalculator){
         // Here, I am resetting the Policy Register object to empty state
         // This way, it should return an empty Optional object since there are no customers in the register.
 
-        POLICY_REGISTER = new PolicyRegister();
+        POLICY_REGISTER = new PolicyRegister(new NoClaimBonusCalculator(premiumCalculator));
         Optional<String> result = POLICY_REGISTER.getCustomerWithMostPolicies();
 
         Assertions.assertTrue(result.isEmpty(), "Optional Object must be empty if no customer found with most policies!");

@@ -1,18 +1,22 @@
 package service;
 
 import com.wipfli.training.model.Policy;
+import com.wipfli.training.model.PremiumCalculable;
 import com.wipfli.training.service.NoClaimBonusCalculator;
+import com.wipfli.training.service.StandardPremiumCalculator;
 import fixtures.TestFixtures;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(PremiumCalculableResolver.class)
 public class NoClaimBonusCalculatorTest {
     private NoClaimBonusCalculator NO_CLAIM_BONUS_CALCULATOR;
 
     @BeforeEach
-    void setUp(){
-        NO_CLAIM_BONUS_CALCULATOR = new NoClaimBonusCalculator();
+    void setUp(PremiumCalculable premiumCalculator){
+        NO_CLAIM_BONUS_CALCULATOR = new NoClaimBonusCalculator(premiumCalculator);
     }
 
     @Test
