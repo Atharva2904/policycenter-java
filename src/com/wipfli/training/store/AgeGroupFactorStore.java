@@ -1,9 +1,11 @@
 package com.wipfli.training.store;
 
 import com.wipfli.training.model.AgeGroupFactor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class AgeGroupFactorStore {
     private final List<AgeGroupFactor> ageGroupFactorList = List.of(
             new AgeGroupFactor(18, 25, 0.2),
