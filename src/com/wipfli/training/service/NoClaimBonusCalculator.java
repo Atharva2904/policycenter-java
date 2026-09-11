@@ -3,13 +3,18 @@ package com.wipfli.training.service;
 import com.wipfli.training.model.Policy;
 import com.wipfli.training.model.PremiumCalculable;
 import com.wipfli.training.store.AgeGroupFactorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@Component("noClaimBonusCalculator")
 public class NoClaimBonusCalculator implements PremiumCalculable {
     private final PremiumCalculable STANDARD_PREMIUM_CALCULATOR;
 
-    public NoClaimBonusCalculator(PremiumCalculable standardPremiumCalculator) {
+    public NoClaimBonusCalculator(
+            @Qualifier("standardPremiumCalculator")
+            PremiumCalculable standardPremiumCalculator) {
         this.STANDARD_PREMIUM_CALCULATOR = standardPremiumCalculator;
     }
 
