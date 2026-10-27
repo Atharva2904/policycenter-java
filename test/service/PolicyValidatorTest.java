@@ -34,7 +34,7 @@ public class PolicyValidatorTest {
     @Test
     @DisplayName("Test case to validate the PolicyValidator.validate() function when a NULL policy object is passed")
     void policyValidator_validate_returnsPolicyNotFoundException(){
-        Assertions.assertThrows(PolicyNotFoundException.class, () -> POLICY_VALIDATOR.validate(null));
+        Assertions.assertThrows(InvalidPolicyDataException.class, () -> POLICY_VALIDATOR.validate(null));
     }
 
     @Test

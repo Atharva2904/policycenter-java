@@ -26,6 +26,15 @@ public final class TestFixtures {
         );
     }
 
+    public static PolicyHolder userKavya() {
+        return new PolicyHolder(
+                "Kavya",
+                "Ghanekar",
+                23,
+                State.IS
+        );
+    }
+
     public static PolicyHolder userMeena() {
         return new PolicyHolder(
                 "Meena",
@@ -59,7 +68,7 @@ public final class TestFixtures {
         return new CarPolicy(
                 "POL-2001",
                 userRavi(),
-                "IL-ABC-123",
+                "IL-ABC-129",
                 1,
                 LocalDate.of(2026, 8, 15)
         );
@@ -79,7 +88,7 @@ public final class TestFixtures {
         return new CarPolicy(
                 "POL-2006",
                 userRavi(),
-                "IL-ABC-123",
+                "IL-ABC-124",
                 3,
                 LocalDate.of(2026, 12, 1)
         );
@@ -110,12 +119,33 @@ public final class TestFixtures {
     public static TruckPolicy pol2002() {
         return new TruckPolicy(
                 "POL-2002",
-                userRavi(),
+                userKavya(),
                 12.5,
                 0,
                 LocalDate.of(2026, 9, 1)
         );
     }
+
+    public static CarPolicy pol2007() {
+        return new CarPolicy(
+                "POL-2007",
+                userKavya(),
+                "IL-ABC-123",
+                0,
+                LocalDate.of(2026, 9, 1)
+        );
+    }
+
+    public static CarPolicy pol2008() {
+        return new CarPolicy(
+                "POL-2007",
+                userKavya(),
+                "IL-ABC-1789",
+                0,
+                LocalDate.of(2026, 9, 1)
+        );
+    }
+
 
     public static CarPolicy carPolicyWithNegativeClaimsCount() {
         return new CarPolicy(
