@@ -1,9 +1,17 @@
 package com.wipfli.training.model;
 
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
 import java.time.LocalDate;
 
+@Entity
+@DiscriminatorValue("CAR")
 public class CarPolicy extends Policy{
+
+    @Column(name = "registration_number", unique = true, length = 56)
 
     private String registrationNumber;
 
@@ -16,6 +24,11 @@ public class CarPolicy extends Policy{
         this.registrationNumber = registrationNumber;
     }
 
+
+    // No-arg constructor required by JPA/Hibernate
+    protected CarPolicy() {
+        super();
+    }
 
     public String getRegistrationNumber() {
         return registrationNumber;

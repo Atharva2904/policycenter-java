@@ -13,6 +13,10 @@ public class StandardPremiumCalculator implements PremiumCalculable {
     private static final Double COST_PER_CLAIM = 150.0;
     private final AgeGroupFactorStore ageGroupFactorStore;
 
+    public StandardPremiumCalculator() {
+        this(new AgeGroupFactorStore());
+    }
+
     public StandardPremiumCalculator(AgeGroupFactorStore ageGroupFactorStore){
         this.ageGroupFactorStore = ageGroupFactorStore;
     }

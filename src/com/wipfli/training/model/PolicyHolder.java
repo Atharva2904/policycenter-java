@@ -1,22 +1,44 @@
 package com.wipfli.training.model;
 
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
+@Entity
+@Table(name = "policy_holder")
 public class PolicyHolder {
-    private final String userID;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 64)
+    private String userID;
+
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private State state;
+
+    @Column(nullable = false)
     private int age;
 
 
+
+
     public PolicyHolder(String firstName, String lastName, int age, State state) {
-        this.userID = UUID.randomUUID().toString();
         this.firstName = validateName(firstName);
         this.lastName = validateName(lastName);
         this.age = validateAge(age);
         this.state = state;
+    }
+
+    // No-arg constructor required by JPA/Hibernate
+    protected PolicyHolder() {
     }
 
 

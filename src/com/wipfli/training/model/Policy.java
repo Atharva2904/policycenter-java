@@ -3,13 +3,12 @@ package com.wipfli.training.model;
 import com.wipfli.training.exception.IllegalStatusChangeException;
 import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.exception.RenewalNotAllowedException;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -20,17 +19,44 @@ import java.util.Objects;
  * shared attributes including PolicyHolder details, number of previous claims, vehicle type etc.
  */
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="policy_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("POLICY")
 public abstract class Policy {
-    private final String policyNumber;
+
+    /* @Id annotation marks a field in a model class as the primary key
+    @GeneratedValue annotation is used to specify the primary key generation strategy.
+    In this case, it uses UUID strategy to generate unique identifiers for each policy instance.
+     */
+
+
+    @Id
+    @Column(length = 36, unique = true)
+    private String policyNumber;  // ← Remove final
+
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "policy_holder_id", nullable = false)
     private PolicyHolder policyHolder;
 
-    private final Instant createdAt;
+    @Column(nullable = false)
+    private Instant createdAt;  // ← Remove final
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private PolicyStatus policyStatus;
 
+    @Column(nullable = false)
     private LocalDate startDate;
     private LocalDate expiryDate;
 
+    @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
+
+    @Column(nullable = false,
+        check = @CheckConstraint(constraint = "claims_count >= 0", name = "claims_count_non_negative")
+    )
     private int claimsCount;
 
 
@@ -65,7 +91,12 @@ public abstract class Policy {
         this.policyStatus = PolicyStatus.ACTIVE;
     }
 
-
+    // No-arg constructor required by JPA/Hibernate for entity instantiation
+    protected Policy() {
+        this.policyNumber = null;
+        this.createdAt = Instant.now();
+        this.policyStatus = PolicyStatus.ACTIVE;
+    }
 
     public int getClaimsCount() {
         return claimsCount;

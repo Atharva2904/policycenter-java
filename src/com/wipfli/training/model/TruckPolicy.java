@@ -2,8 +2,13 @@ package com.wipfli.training.model;
 
 
 import com.wipfli.training.exception.InvalidPolicyDataException;
+import jakarta.persistence.CheckConstraint;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
+
 
 /**
  * This is a concrete implementation of the abstract class {@link Policy}
@@ -11,7 +16,13 @@ import java.time.LocalDate;
  * Additionally it consists of another attribute: {@code loadCapacityTons}
  *
  */
+@Entity
+@DiscriminatorValue("TRUCK")
 public class TruckPolicy extends Policy {
+
+    @Column(name = "load_capacity_tons",
+            check = @CheckConstraint(constraint = "load_capacity_tons > 0", name = "load_capacity_positive")
+    )
     private double loadCapacityTons;
 
     // A Constant variable that indicates the minimum age limit for a truck driver.
@@ -31,6 +42,11 @@ public class TruckPolicy extends Policy {
         }
 
         this.loadCapacityTons = loadCapacityTons;
+    }
+
+    // No-arg constructor required by JPA/Hibernate
+    protected TruckPolicy() {
+        super();
     }
 
     public double getLoadCapacityTons() {

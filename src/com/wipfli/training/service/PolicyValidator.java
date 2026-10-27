@@ -18,10 +18,12 @@ public class PolicyValidator {
     }
 
     public static void validate(Policy policy) throws PolicyNotFoundException, PolicyBusinessException {
-        if (policy == null) throw new PolicyNotFoundException("UNKNOWN", "Policy object cannot be null!");
+        if (policy == null) throw new InvalidPolicyDataException("UNKNOWN", "Policy object cannot be null!");
 
         String policyNumber = policy.getPolicyNumber();
 
+        if(policyNumber == null || policyNumber.isEmpty())
+            throw new PolicyNotFoundException("UNKNOWN", "Policy number cannot be null or empty!");
 
         if(policy.getVehicleType() == null) throw new InvalidPolicyDataException(policyNumber, """
                 Vehicle type cannot be null! Enter one of the following choices:

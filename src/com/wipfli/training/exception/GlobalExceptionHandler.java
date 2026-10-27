@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 exception.getPolicyNumber(),
                 exception.getMessage(),
-                Timestamp.from(Instant.now())
+                Timestamp.from(Instant.now()),
+                com.wipfli.training.dto.APIStatus.failure(HttpStatus.NOT_FOUND.value(), exception.getMessage())
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -33,7 +34,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 exception.getPolicyNumber(),
                 exception.getMessage(),
-                Timestamp.from(Instant.now())
+                Timestamp.from(Instant.now()),
+                com.wipfli.training.dto.APIStatus.failure(HttpStatus.CONFLICT.value(), exception.getMessage())
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
@@ -46,7 +48,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 exception.getPolicyNumber(),
                 exception.getMessage(),
-                Timestamp.from(Instant.now())
+                Timestamp.from(Instant.now()),
+                com.wipfli.training.dto.APIStatus.failure(HttpStatus.BAD_REQUEST.value(), exception.getMessage())
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -59,7 +62,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 "N/A",
                 exception.getMessage(),
-                Timestamp.from(Instant.now())
+                Timestamp.from(Instant.now()),
+                com.wipfli.training.dto.APIStatus.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage())
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

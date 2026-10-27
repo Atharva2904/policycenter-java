@@ -11,5 +11,18 @@ public record PolicyResponse(
         VehicleType vehicleType,
         int claimsCount,
         String holderName,
-        LocalDate expiryDate
-) {}
+        LocalDate expiryDate,
+        APIStatus apiStatus
+) {
+    public PolicyResponse(
+            String policyNumber,
+            PolicyStatus policyStatus,
+            VehicleType vehicleType,
+            int claimsCount,
+            String holderName,
+            LocalDate expiryDate
+    ) {
+        this(policyNumber, policyStatus, vehicleType, claimsCount, holderName, expiryDate,
+                APIStatus.success("Policy processed successfully"));
+    }
+}
