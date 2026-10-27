@@ -4,30 +4,45 @@ import com.wipfli.training.exception.DuplicatePolicyNumberException;
 import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.exception.PolicyNotFoundException;
 import com.wipfli.training.model.Policy;
-import com.wipfli.training.model.PremiumCalculable;
 import com.wipfli.training.model.VehicleType;
 import com.wipfli.training.repository.PolicyRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.wipfli.training.repository.VehicleTypeCount;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PolicyRegister {
-    private PremiumCalculable premiumCalculator;
+    private final PremiumCalculatorResolver premiumCalculatorResolver;
     private final PolicyRepository repository;
+    private final LocalDate REFERENCE_DATE = LocalDate.of(2026, 8, 9);
+
 
 
     public PolicyRegister(
-            @Qualifier("noClaimBonusCalculator")
-            PremiumCalculable premiumCalculator, PolicyRepository repository) {
-        this.premiumCalculator = premiumCalculator;
+            PremiumCalculatorResolver premiumCalculatorResolver,
+            PolicyRepository repository) {
+        this.premiumCalculatorResolver = premiumCalculatorResolver;
         this.repository = repository;
     }
 
     public void add(Policy policy) {
+        if (policy == null) {
+            throw new InvalidPolicyDataException("UNKNOWN", "Policy must not be null");
+        }
+
+        if (repository.findByPolicyNumber(policy.getPolicyNumber()).isPresent()) {
+            throw new DuplicatePolicyNumberException(
+                    policy.getPolicyNumber(),
+                    "A policy with number " + policy.getPolicyNumber() + " already exists"
+            );
+        }
         repository.save(policy);
     }
 
@@ -43,7 +58,7 @@ public class PolicyRegister {
             The orElse() detects that Optional is Empty and replaces the empty value with an immutable Empty List
          */
 
-        List<Policy> policyListGroupedByCustomer = repository.findByCustomerName(customerName);
+        List<Policy> policyListGroupedByCustomer = repository.findByPolicyHolderFirstName(customerName);
 
         return policyListGroupedByCustomer;
     }
@@ -54,26 +69,25 @@ public class PolicyRegister {
         return policyListGroupedByVehicleType;
     }
 
-    public double getPremium(String policyNumber) throws PolicyNotFoundException {
+    public double   getPremium(String policyNumber) throws PolicyNotFoundException {
         Policy policy = repository.findByPolicyNumber(policyNumber)
                 .orElseThrow(() -> new PolicyNotFoundException(
                         policyNumber,
                         "No policy found with number: " + policyNumber
                 ));
-        return premiumCalculator.calculatePremium(policy);
+        return premiumCalculatorResolver.resolve(policy).calculatePremium(policy);
     }
 
     public List<Policy> findExpiringWithinDays(int days) {
 
-
-        List<Policy> policiesExpiringWithinDays = repository.findByExpiryDateRange(days);
+        LocalDate endDate = REFERENCE_DATE.plusDays(days);
+        List<Policy> policiesExpiringWithinDays = repository.findByExpiryDateBetween(REFERENCE_DATE, endDate);
 
         return policiesExpiringWithinDays;
 
     }
 
-    public Hashtable<VehicleType, Double> totalPremiumByVehicleType() {
-        Hashtable<VehicleType, Double> totalPremiumGroupedByVehicleType = new Hashtable<>();
+    public Map<VehicleType, Double> totalPremiumByVehicleType() {
 
         /*
             .sum() is a method provided by the Stream API in Java. It is used to calculate the sum of a stream of numeric values.
@@ -82,39 +96,37 @@ public class PolicyRegister {
 
          */
 
-        EnumMap<VehicleType, List<Policy>> policiesByVehicleType = new EnumMap<>(VehicleType.class);
-        repository.countPoliciesByVehicleType().forEach((vehicleType, count) ->
-                policiesByVehicleType.put(vehicleType, repository.findByVehicleType(vehicleType))
-        );
+        return repository.findAll()
+                        .stream()
+                                .collect(Collectors.groupingBy(
+                                        Policy::getVehicleType,
+                                        Collectors.summingDouble(
+                                                policy -> premiumCalculatorResolver.resolve(policy).calculatePremium(policy)
+                                        )
+                                ));
 
 
-        policiesByVehicleType.forEach((vehicleType, policies) ->
-                totalPremiumGroupedByVehicleType.put(vehicleType, policies.stream()
-                        .mapToDouble(p -> premiumCalculator.calculatePremium(p))
-                        .sum()
-                )
-        );
-
-
-        return totalPremiumGroupedByVehicleType;
     }
 
-    public Hashtable<VehicleType, Integer> countPoliciesByVehicleType() {
+    public List<VehicleTypeCount> countPoliciesByVehicleType() {
 
-        return repository.countPoliciesByVehicleType();
+        return repository.countPoliciesGroupedByVehicleType();
     }
 
     public Optional<String> getCustomerWithMostPolicies() {
 
-        return repository.getCustomerWithMostPolicies();
+        Pageable topOne = PageRequest.of(0, 1);
 
+        List<String> customerNames = repository.findCustomerNamesOrderedByPolicyCount(topOne);
+
+        return customerNames.isEmpty() ? Optional.empty() : Optional.of(customerNames.get(0));
     }
 
     public Map<String, Double> getTop5PoliciesByPremium() {
-        Map<String, Policy> policyMap = repository.findAll();
+        List<Policy> policyMap = repository.findAll();
 
-        return policyMap.values().stream()
-                .map(policy -> Map.entry(policy.getPolicyNumber(), premiumCalculator.calculatePremium(policy)))
+        return policyMap.stream()
+                .map(policy -> Map.entry(policy.getPolicyNumber(), premiumCalculatorResolver.resolve(policy).calculatePremium(policy)))
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(5)
                 .collect(Collectors.toMap(
@@ -123,6 +135,33 @@ public class PolicyRegister {
                         (oldValue, newValue) -> oldValue,
                         LinkedHashMap::new
                 ));
+    }
+
+    public Policy getExistingPolicy(String policyNumber) throws PolicyNotFoundException {
+        return repository.findByPolicyNumber(policyNumber).orElseThrow(
+                () -> new PolicyNotFoundException(
+                        policyNumber,
+                        "No policy found with number: " + policyNumber
+                )
+        );
+    }
+
+    public void expire(String policyNumber) throws PolicyNotFoundException{
+        Policy policy = getExistingPolicy(policyNumber);
+
+        policy.expire();
+    }
+
+    public void renew(String policyNumber, LocalDate renewalDate) throws PolicyNotFoundException{
+        Policy policy = getExistingPolicy(policyNumber);
+
+        policy.renew(renewalDate);
+    }
+
+    public void recordClaim(String policyNumber) throws PolicyNotFoundException {
+        Policy policy = getExistingPolicy(policyNumber);
+
+        policy.recordClaim();
     }
 
 
