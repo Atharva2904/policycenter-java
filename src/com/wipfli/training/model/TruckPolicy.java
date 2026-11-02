@@ -17,7 +17,7 @@ import java.time.LocalDate;
  *
  */
 @Entity
-@DiscriminatorValue("TRUCK")
+@DiscriminatorValue("TRUCK_POLICY")
 public class TruckPolicy extends Policy {
 
     @Column(name = "load_capacity_tons",
@@ -28,12 +28,12 @@ public class TruckPolicy extends Policy {
     // A Constant variable that indicates the minimum age limit for a truck driver.
     private static final int TRUCK_AGE_LIMIT = 21;
 
-    public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, LocalDate expiryDate) {
-        this(policyNumber, policyHolder, loadCapacityTons, 0, expiryDate);
+    public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, LocalDate startDate, LocalDate expiryDate) {
+        this(policyNumber, policyHolder, loadCapacityTons, 0, startDate, expiryDate);
     }
 
-    public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, int previousClaimsCount, LocalDate expiryDate) {
-        super(policyNumber, policyHolder, VehicleType.TRUCK, previousClaimsCount, expiryDate);
+    public TruckPolicy(String policyNumber, PolicyHolder policyHolder, double loadCapacityTons, int previousClaimsCount, LocalDate startDate, LocalDate expiryDate) {
+        super(policyNumber, policyHolder, VehicleType.TRUCK, previousClaimsCount, startDate, expiryDate);
 
         // Special Case: For a truck-driver, the minimum age limit is 21.
         if (policyHolder.getAge() < TRUCK_AGE_LIMIT) {

@@ -37,7 +37,6 @@ public class PolicyHolder {
         this.state = state;
     }
 
-    // No-arg constructor required by JPA/Hibernate
     protected PolicyHolder() {
     }
 

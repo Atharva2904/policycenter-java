@@ -3,7 +3,9 @@ package com.wipfli.training.model;
 import com.wipfli.training.exception.IllegalStatusChangeException;
 import com.wipfli.training.exception.InvalidPolicyDataException;
 import com.wipfli.training.exception.RenewalNotAllowedException;
+import com.wipfli.training.service.PolicyValidator;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -33,7 +35,7 @@ public abstract class Policy {
 
     @Id
     @Column(length = 36, unique = true)
-    private String policyNumber;  // ← Remove final
+    private String policyNumber;
 
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -41,7 +43,7 @@ public abstract class Policy {
     private PolicyHolder policyHolder;
 
     @Column(nullable = false)
-    private Instant createdAt;  // ← Remove final
+    private Instant createdAt;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -68,8 +70,8 @@ public abstract class Policy {
      * It does not accept claims count as a parameter. It is set to 0 by default.
      */
 
-    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, LocalDate expiryDate) {
-        this(policyNumber, policyHolder, vehicleType, 0, expiryDate);
+    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, LocalDate startDate, LocalDate expiryDate) {
+        this(policyNumber, policyHolder, vehicleType, 0, startDate, expiryDate);
     }
 
     /**
@@ -80,15 +82,16 @@ public abstract class Policy {
      * @param previousClaimsCount
      */
 
-    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, int previousClaimsCount, LocalDate expiryDate) {
+    public Policy(String policyNumber, PolicyHolder policyHolder, VehicleType vehicleType, int previousClaimsCount, LocalDate startDate, LocalDate expiryDate) {
         this.policyNumber = policyNumber;
         this.policyHolder = policyHolder;
         this.vehicleType = vehicleType;
         this.claimsCount = previousClaimsCount;
         this.createdAt = Instant.now();
-        this.startDate = LocalDate.now();
+        this.startDate = startDate;
         this.expiryDate = expiryDate;
         this.policyStatus = PolicyStatus.ACTIVE;
+
     }
 
     // No-arg constructor required by JPA/Hibernate for entity instantiation

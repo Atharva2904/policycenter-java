@@ -12,8 +12,7 @@ public class PolicyValidator {
 
     public static void validateAge(int age){
         if(age < 18 || age > 100)
-            throw new IllegalArgumentException(
-                    "Age must be between 18 and 100");
+            throw new InvalidPolicyDataException("N/A", "Age must be between 18 and 100");
 
     }
 

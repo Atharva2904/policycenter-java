@@ -10,6 +10,7 @@ public record PolicyRequest(
         int holderAge,
         State holderState,
         VehicleType vehicleType,
+        String startDate,
         String expiryDate,
         int claimsCount,
         String registrationNumber,

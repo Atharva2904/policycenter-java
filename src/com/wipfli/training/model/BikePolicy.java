@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@DiscriminatorValue("BIKE")
+@DiscriminatorValue("BIKE_POLICY")
 
 public class BikePolicy extends Policy {
 
@@ -15,12 +15,12 @@ public class BikePolicy extends Policy {
     )
     private int engineCC;
 
-    public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, LocalDate expiryDate){
-        this(policyNumber, policyHolder, engineCC, 0, expiryDate);
+    public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, LocalDate startDate, LocalDate expiryDate){
+        this(policyNumber, policyHolder, engineCC, 0, startDate, expiryDate);
     }
 
-    public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, int previousClaimsCount, LocalDate expiryDate){
-        super(policyNumber, policyHolder, VehicleType.BIKE, previousClaimsCount, expiryDate);
+    public BikePolicy(String policyNumber, PolicyHolder policyHolder, int engineCC, int previousClaimsCount, LocalDate startDate, LocalDate expiryDate){
+        super(policyNumber, policyHolder, VehicleType.BIKE, previousClaimsCount, startDate, expiryDate);
         this.engineCC = engineCC;
     }
 

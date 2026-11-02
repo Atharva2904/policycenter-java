@@ -15,18 +15,18 @@ public class PolicyFactory {
 
      */
 
-    public static Policy createCarPolicy(String policyNumber, PolicyHolder policyHolder, String registrationNumber, int numberOfClaims, LocalDate expiryDate){
-        CarPolicy carPolicy = new CarPolicy(policyNumber, policyHolder, registrationNumber, numberOfClaims,  expiryDate);
+    public static Policy createCarPolicy(String policyNumber, PolicyHolder policyHolder, String registrationNumber, int numberOfClaims, LocalDate startDate, LocalDate expiryDate){
+        CarPolicy carPolicy = new CarPolicy(policyNumber, policyHolder, registrationNumber, numberOfClaims, startDate, expiryDate);
         return carPolicy;
     }
     public static Policy createBikePolicy(String policyNumber, PolicyHolder policyHolder,
-                                        int engineCapacity,int numberOfClaims,  LocalDate expiryDate){
-        return new BikePolicy(policyNumber, policyHolder, engineCapacity, expiryDate);
+                                        int engineCapacity,int numberOfClaims,  LocalDate startDate, LocalDate expiryDate){
+        return new BikePolicy(policyNumber, policyHolder, engineCapacity, numberOfClaims, startDate, expiryDate);
 
     }
     public static Policy createTruckPolicy(String policyNumber, PolicyHolder policyHolder
-                        , double loadCapacity, int numberOfClaims, LocalDate expiryDate) {
-        return new TruckPolicy(policyNumber, policyHolder, loadCapacity, expiryDate);
+                        , double loadCapacity, int numberOfClaims, LocalDate startDate, LocalDate expiryDate) {
+        return new TruckPolicy(policyNumber, policyHolder, loadCapacity, numberOfClaims, startDate, expiryDate);
 
     }
 }

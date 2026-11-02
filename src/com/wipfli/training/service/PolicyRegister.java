@@ -63,6 +63,10 @@ public class PolicyRegister {
         return policyListGroupedByCustomer;
     }
 
+    public List<Policy> findByCustomerFullName(String firstName, String lastName) {
+        return repository.findByPolicyHolderFirstNameAndPolicyHolderLastName(firstName, lastName);
+    }
+
     public List<Policy> findByVehicleType(VehicleType vehicleType) {
         List<Policy> policyListGroupedByVehicleType = repository.findByVehicleType(vehicleType);
 

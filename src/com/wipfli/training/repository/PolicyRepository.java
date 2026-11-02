@@ -30,6 +30,7 @@ public interface PolicyRepository extends JpaRepository<Policy, String> {
     List<Policy> findByPolicyHolderFirstName(String customerName);
     List<Policy> findByVehicleType(VehicleType vehicleType);
     List<Policy> findByExpiryDateBetween(LocalDate startDate, LocalDate endDate);
+    List<Policy> findByPolicyHolderFirstNameAndPolicyHolderLastName(String firstName, String lastName);
 
     // We are writing this query using JPQL - It uses Entity names and not the table names
     @Query(
@@ -47,7 +48,7 @@ public interface PolicyRepository extends JpaRepository<Policy, String> {
 FROM PolicyHolder p
 LEFT JOIN Policy po 
 ON po.policyHolder = p
-GROUP BY p.userID, p.firstName, p.lastName
+GROUP BY p.firstName, p.lastName
 ORDER BY COUNT(po) DESC
             """
     )
