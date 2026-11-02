@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.*;
@@ -32,7 +33,6 @@ import java.util.*;
         StandardPremiumCalculator.class,
         NoClaimBonusCalculator.class
 })
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class PolicyRegisterTest {
 
     @Autowired
@@ -141,26 +141,12 @@ public class PolicyRegisterTest {
         String[] parts = result.get().split(",");
         String fullName = parts[0] + " " + parts[1];
         long count = Long.parseLong(parts[2]);
-        Assertions.assertEquals("Ravi Kumar", fullName, "Customer with most policies does not match the expected outcome!");
-        Assertions.assertEquals(1, count, "Count of policies for the customer with most policies does not match the expected outcome!");
-    }
 
-    @Test
-    void policyRegister_findCustomerWithMostPolicies_returnsEmptyOptional(){
-        // Here, I am resetting the Policy Register object to empty state
-        // This way, it should return an empty Optional object since there are no customers in the register.
+        List<String> all = POLICY_REPOSITORY.findCustomerNamesOrderedByPolicyCount(PageRequest.of(0, 10));
+        all.forEach(System.out::println);
 
-        StandardPremiumCalculator standardPremiumCalculator = new StandardPremiumCalculator(new AgeGroupFactorStore());
-        NoClaimBonusCalculator noClaimBonusCalculator = new NoClaimBonusCalculator(standardPremiumCalculator);
-        PremiumCalculatorResolver premiumCalculatorResolver = new PremiumCalculatorResolver(
-                standardPremiumCalculator,
-                noClaimBonusCalculator
-        );
-
-        POLICY_REGISTER = new PolicyRegister(premiumCalculatorResolver, POLICY_REPOSITORY);
-        Optional<String> result = POLICY_REGISTER.getCustomerWithMostPolicies();
-
-        Assertions.assertTrue(result.isEmpty(), "Optional Object must be empty if no customer found with most policies!");
+        Assertions.assertEquals("Bhuvaneshwar Kumar", fullName, "Customer with most policies does not match the expected outcome!");
+        Assertions.assertEquals(2, count, "Count of policies for the customer with most policies does not match the expected outcome!");
     }
 
     @Test

@@ -17,51 +17,32 @@ import java.time.LocalDate;
 
 public final class TestFixtures {
 
+    private static final PolicyHolder RAVI = new PolicyHolder("Bhuvaneshwar", "Kumar", 22, State.IS);
+    private static final PolicyHolder KAVYA = new PolicyHolder("Kavya", "Ghanekar", 23, State.IS);
+    private static final PolicyHolder MEENA = new PolicyHolder("Jiya", "Iyer", 34, State.IN);
+    private static final PolicyHolder AJAY = new PolicyHolder("Vijay", "Verma", 41, State.MN);
+    private static final PolicyHolder SNEHA = new PolicyHolder("Sneha", "Rao", 29, State.IS);
+    private static final LocalDate START_DATE = LocalDate.of(2026, 8, 9);
+
     public static PolicyHolder userRavi() {
-        return new PolicyHolder(
-                "Ravi",
-                "Kumar",
-                22,
-                State.IS
-        );
+        return RAVI;
     }
 
     public static PolicyHolder userKavya() {
-        return new PolicyHolder(
-                "Kavya",
-                "Ghanekar",
-                23,
-                State.IS
-        );
+        return KAVYA;
     }
 
     public static PolicyHolder userMeena() {
-        return new PolicyHolder(
-                "Meena",
-                "Iyer",
-                34,
-                State.IN
-        );
+        return MEENA;
     }
 
     public static PolicyHolder userAjay() {
-        return new PolicyHolder(
-                "Ajay",
-                "Verma",
-                41,
-                State.MN
-        );
+        return AJAY;
     }
 
     public static PolicyHolder userSneha() {
-        return new PolicyHolder(
-                "Sneha",
-                "Rao",
-                29,
-                State.IS
-        );
+        return SNEHA;
     }
-
 
 
     public static CarPolicy pol2001() {
@@ -70,6 +51,7 @@ public final class TestFixtures {
                 userRavi(),
                 "IL-ABC-129",
                 1,
+                START_DATE,
                 LocalDate.of(2026, 8, 15)
         );
     }
@@ -80,6 +62,7 @@ public final class TestFixtures {
                 userAjay(),
                 "IN-XYZ-789",
                 0,
+                START_DATE,
                 LocalDate.of(2027, 1, 10)
         );
     }
@@ -90,6 +73,7 @@ public final class TestFixtures {
                 userRavi(),
                 "IL-ABC-124",
                 3,
+                START_DATE,
                 LocalDate.of(2026, 12, 1)
         );
     }
@@ -101,6 +85,7 @@ public final class TestFixtures {
                 userMeena(),
                 150,
                 2,
+                START_DATE,
                 LocalDate.of(2026, 8, 20)
         );
     }
@@ -111,6 +96,7 @@ public final class TestFixtures {
                 userSneha(),
                 650,
                 0,
+                START_DATE,
                 LocalDate.of(2026, 8, 25)
         );
     }
@@ -122,6 +108,7 @@ public final class TestFixtures {
                 userKavya(),
                 12.5,
                 0,
+                START_DATE,
                 LocalDate.of(2026, 9, 1)
         );
     }
@@ -130,8 +117,9 @@ public final class TestFixtures {
         return new CarPolicy(
                 "POL-2007",
                 userKavya(),
-                "IL-ABC-123",
+                "IL-ABC-2991",
                 0,
+                START_DATE,
                 LocalDate.of(2026, 9, 1)
         );
     }
@@ -142,6 +130,7 @@ public final class TestFixtures {
                 userKavya(),
                 "IL-ABC-1789",
                 0,
+                START_DATE,
                 LocalDate.of(2026, 9, 1)
         );
     }
@@ -153,6 +142,7 @@ public final class TestFixtures {
                 userAjay(),
                 "IN-XYZ-789",
                 -1,
+                START_DATE,
                 LocalDate.of(2027, 1, 10)
         );
     }
@@ -163,6 +153,7 @@ public final class TestFixtures {
                 userAjay(),
                 null,
                 1,
+                START_DATE,
                 LocalDate.of(2027, 1, 10)
         );
     }

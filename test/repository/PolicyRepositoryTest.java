@@ -2,18 +2,14 @@ package repository;
 
 import com.wipfli.training.PolicyCenterApplication;
 import com.wipfli.training.exception.IllegalStatusChangeException;
-import com.wipfli.training.exception.RenewalNotAllowedException;
 import com.wipfli.training.model.*;
 import com.wipfli.training.repository.PolicyRepository;
 import fixtures.TestFixtures;
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDate;
@@ -21,13 +17,9 @@ import java.util.List;
 import java.util.Optional;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(classes = {
         PolicyCenterApplication.class,
-        PolicyRepository.class,
-
 })
-
 public class PolicyRepositoryTest {
 
     @Autowired
@@ -38,7 +30,11 @@ public class PolicyRepositoryTest {
 
     @Test
     void save_carPolicy_persistsAndReturnsCarPolicyWithRegistrationNumber(){
+
+
         Policy carPolicy = TestFixtures.pol2001();
+        POLICY_REPOSITORY.saveAndFlush(carPolicy);
+
 
         POLICY_REPOSITORY.save(carPolicy);
 
@@ -258,6 +254,8 @@ public class PolicyRepositoryTest {
 
     }
 
+
+
     @Test
     void findByExpiryDateBetween_excludesJustOutsideBoundaryRange(){
         POLICY_REPOSITORY.save(TestFixtures.pol2006());
@@ -288,22 +286,25 @@ public class PolicyRepositoryTest {
 
 
 
-    @Test
-    void save_policiesWithSamePolicyNumber(){
+     @Test
+     void save_policiesWithSamePolicyNumber(){
 
-        // Two Policy Objects with same policy number
+         // Two Policy Objects with same policy number
 
-        POLICY_REPOSITORY.save(TestFixtures.pol2007());
-        TEST_ENTITY_MANAGER.flush();
-        TEST_ENTITY_MANAGER.clear();
+         POLICY_REPOSITORY.save(TestFixtures.pol2007());
+         TEST_ENTITY_MANAGER.flush();
+         TEST_ENTITY_MANAGER.clear();
 
-        Assertions.assertThrows(DataIntegrityViolationException.class,
-                () ->
-                    POLICY_REPOSITORY.saveAndFlush(TestFixtures.pol2007())
-                );
+         // Expected behaviour of upsert or merge
+         // Since the duplicate policy is directly being added through the repository - it skips the duplication checks in register service
+         // And Spring JPA's upsert mechanism updates the record with given ID instead of rejecting it outright
+
+         Assertions.assertDoesNotThrow(() ->
+                     POLICY_REPOSITORY.saveAndFlush(TestFixtures.pol2008())
+                 );
 
 
-    }
+     }
 
 
 

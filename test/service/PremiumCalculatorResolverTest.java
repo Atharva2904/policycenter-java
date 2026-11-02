@@ -10,6 +10,8 @@ import fixtures.TestFixtures;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
 public class PremiumCalculatorResolverTest {
 
     private final StandardPremiumCalculator standardPremiumCalculator =
@@ -64,7 +66,8 @@ public class PremiumCalculatorResolverTest {
                 null,
                 "REG-XYZ",
                 0,
-                java.time.LocalDate.of(2027, 1, 10)
+                LocalDate.of(2026, 8, 9),
+                LocalDate.of(2027, 1, 10)
         );
 
         IllegalArgumentException ex = Assertions.assertThrows(
